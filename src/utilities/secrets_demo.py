@@ -3,3 +3,7 @@ class Secrets:
     key = ""
     b64secret = ""
     passphrase = ""
+
+    sandbox_key = ""
+    sandbox_b64secret = ""
+    sanbox_passphrase = ""
