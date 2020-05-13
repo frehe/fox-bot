@@ -1,11 +1,15 @@
 import cbpro
 
-from abc import ABC, abstractmethod
+from abc import ABC
 from utilities.product_infos import ProductInfos
 
 
 class Strategy(ABC):
-    def __init__(self, buy_signal_generator, sell_signal_generator, risk_allocator, product: str, public_client: cbpro.PublicClient, auth_client: cbpro.AuthenticatedClient):
+    def __init__(
+        self, buy_signal_generator, sell_signal_generator,
+            risk_allocator, product: str, public_client: cbpro.PublicClient,
+            auth_client: cbpro.AuthenticatedClient):
+
         self.buy_signal_generator = buy_signal_generator
         self.sell_signal_generator = sell_signal_generator
         self.risk_allocator = risk_allocator
@@ -38,6 +42,3 @@ class Strategy(ABC):
         print(sell_trade)
 
         return True
-
-
-
