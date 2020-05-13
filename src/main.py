@@ -2,11 +2,6 @@ import cbpro
 
 from strategies.relative_drop_strategy import RelativeDropStrategy
 
-from signal_generators.buy_signal_generators.relative_drop_signal import RelativeDropSignal
-from signal_generators.buy_signal_generators.buy_signal_generator import BuySignalGenerator
-
-from risk_allocators.simple_percentage_risk_allocator import SimplePercentageRiskAllocator
-
 from utilities.secrets import Secrets
 
 
