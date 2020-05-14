@@ -14,5 +14,3 @@ class ProductInfos():
 
         ProductInfos.min_sizes[buy_currency] = currencies[currency_list.index(buy_currency)]['min_size']
         ProductInfos.min_sizes[base_currency] = currencies[currency_list.index(base_currency)]['min_size']
-
-
