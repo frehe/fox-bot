@@ -3,10 +3,18 @@ import calendar
 from datetime import datetime, timezone
 
 
-def getIndexOfCurrency(accounts: list, currency: str):
+def getIndexOfCurrency(accounts: list, currency: str) -> int:
     return [
         elem['currency'] for _, elem in enumerate(accounts)
         ].index(currency)
+
+
+def getIDOfCurrencyCoinGecko(coins_list: list, currency: str) -> str:
+    idx = [
+        elem['symbol'] for _, elem in enumerate(coins_list)
+        ].index(currency.lower())
+
+    return coins_list[idx]['id']
 
 
 def UnixToISOTimestamp(unix_time: float) -> str:
@@ -26,7 +34,7 @@ def ISOToUnixTimestamp(iso_time: str) -> str:
     """Convert an ISO8601 date into the unix epoch time.
 
     Arguments:
-        iso_time {str} -- [description]
+        iso_time {str} -- formatted as '%Y-%m-%dT%H:%M:%S.%f'
 
     Returns:
         str -- [description]
