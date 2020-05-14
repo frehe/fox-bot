@@ -1,4 +1,5 @@
 import cbpro
+import time
 
 from strategies.relative_drop_strategy import RelativeDropStrategy
 
@@ -14,9 +15,10 @@ auth_client = cbpro.AuthenticatedClient(
     Secrets.sandbox_passphrase,
     api_url="https://api-public.sandbox.pro.coinbase.com")
 
-while True:
-    # Spawn N strategies
-    # Wait until a strategy returns True, spawn a new one
-    strategy = RelativeDropStrategy(product, public_client, auth_client, 0.2)
-    strategy.execute()
-    print('Strategy done')
+# Spawn N strategies
+# Wait until a strategy returns True, spawn a new one
+strategy = RelativeDropStrategy(product, public_client, auth_client, 0.2)
+strategy.execute()
+time.sleep(300)
+strategy.strategy_active = False  # Gracefully end strategy
+print('Strategy done')
