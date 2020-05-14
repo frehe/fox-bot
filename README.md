@@ -1,6 +1,6 @@
 # Fox Bot
 
-![Image of Bud Fox](https://m.media-amazon.com/images/M/MV5BNjE1MjM1OTUwOF5BMl5BanBnXkFtZTcwOTAxMjEyMw@@._V1_SY1000_CR0,0,662,1000_AL_.jpg)
+![Image of Bud Fox](https://m.media-amazon.com/images/M/MV5BNjE1MjM1OTUwOF5BMl5BanBnXkFtZTcwOTAxMjEyMw@@._V1_SY1000_CR0,0,662,1000_AL_.jpg =150x)
 
 >  Mr, Gekko, I'm there for you 110%. - *Bud Fox*
 
