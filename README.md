@@ -4,7 +4,9 @@
 
 >  Mr, Gekko, I'm there for you 110%. - *Bud Fox*
 
-A modular bot to create trading strategies, backtest and run on any exchange.
+A modular bot to create trading strategies, backtest and run on any exchange. It is written in Python.
+
+*This software is provided as-is. Use it at your own risk.*
 
 Starting with simple strategies and simulation only.
 
