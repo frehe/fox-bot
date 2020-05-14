@@ -52,7 +52,7 @@ class Strategy(ABC):
 
             # Execute the trade
             trade_result = sell_trade.execute()
-            
+
             self.data_handler.write_trade_history(trade_result)
             self.data_handler.write_balances(self.auth_client, self.product)
 
