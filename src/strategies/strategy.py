@@ -19,6 +19,7 @@ class Strategy(ABC):
         self.product = product
         self.public_client = public_client
         self.auth_client = auth_client
+        self.strategy_active = True
 
         self.data_handler = None
 
@@ -29,33 +30,36 @@ class Strategy(ABC):
         # Refresh information on the traded products
         ProductInfos.refresh(self.public_client, self.product)
 
-        # Launch buy signal generator and wait for signal
-        buy_signal = self.buy_signal_generator.getSignal()
+        while self.strategy_active is True:
+            # Launch buy signal generator and wait for signal
+            buy_signal = self.buy_signal_generator.getSignal()
 
-        # Allocate a risk value and create a trade from it
-        buy_trade = self.risk_allocator.createBuyTrade(buy_signal)
+            # Allocate a risk value and create a trade from it
+            buy_trade = self.risk_allocator.createBuyTrade(buy_signal)
 
-        # Execute the trade
-        trade_result = buy_trade.execute()
+            # Execute the trade
+            trade_result = buy_trade.execute()
 
-        # Log trade
-        self.data_handler.write_trade_history(trade_result)
+            # Log trade
+            self.data_handler.write_trade_history(trade_result)
+            self.data_handler.write_balances(self.auth_client, self.product)
 
-        # Launch sell signal generator and wait for signal
-        sell_signal = self.sell_signal_generator.getSignal(buy_signal)
+            # Launch sell signal generator and wait for signal
+            sell_signal = self.sell_signal_generator.getSignal(buy_signal)
 
-        # Sell position
-        sell_trade = self.risk_allocator.createSellTrade(sell_signal)
+            # Sell position
+            sell_trade = self.risk_allocator.createSellTrade(sell_signal)
 
-        # Execute the trade
-        trade_result = sell_trade.execute()
-        
-        self.data_handler.write_trade_history(trade_result)
+            # Execute the trade
+            trade_result = sell_trade.execute()
+            
+            self.data_handler.write_trade_history(trade_result)
+            self.data_handler.write_balances(self.auth_client, self.product)
 
         return True
 
     def _createHistory(self):
-        dir_path = "../history/past_runs/"
+        dir_path = "./trading_bot/history/past_runs/"
         now = datetime.datetime.now()
         timestamp = now.strftime("%Y-%m-%d--%H:%M:%S")
         dir_path += (timestamp + "/")
