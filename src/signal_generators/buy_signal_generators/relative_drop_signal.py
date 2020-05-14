@@ -16,12 +16,13 @@ class RelativeDropSignal(BuySignalGenerator):
             timespan {[type]} -- [description]
             drop_percentage {[type]} -- [description]
             max_price_percentage {[type]} -- Buy only if current price is at most low + percentage * (high - low)
-        """        
+        """
         self.drop_percentage = drop_percentage
         self.max_price_percentage = max_price_percentage
         self.granularity = 60  # {60, 300, 900, 3600, 21600, 86400}
-        super(RelativeDropSignal, self).__init__(public_client, product, timespan)
-    
+        super(RelativeDropSignal, self).__init__(
+            public_client, product, timespan)
+
     def getSignal(self) -> BuySignal:
         while not self.signal:
             self.timestamp = self.public_client.get_time()
@@ -38,15 +39,15 @@ class RelativeDropSignal(BuySignalGenerator):
             self.day_high = float(day_stats['high'])
 
             self.signal = self._relativeDropSignal()
-            
+
             time.sleep(self.granularity)
-        
+
         buy_signal = BuySignal()
         buy_signal.signal['activated'] = True
         buy_signal.signal['past_rate'] = self.past_rate
         buy_signal.signal['current_rate'] = self.current_rate
         return buy_signal
-    
+
     def _relativeDropSignal(self) -> bool:
         """Issue a buy signal if relative drop is at least drop percentage
 
@@ -64,7 +65,7 @@ class RelativeDropSignal(BuySignalGenerator):
             return True
         else:
             print('Prices have not dropped')
-        # return True
+        return True
         # TODO: Remove above statement
         return False
 

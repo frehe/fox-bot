@@ -33,7 +33,7 @@ class RelativeRiseSignal(SellSignalGenerator):
             api_key=Secrets.key,
             api_secret=Secrets.b64secret,
             api_passphrase=Secrets.passphrase,
-            channels=[{ "name": "ticker"}])
+            channels=[{"name": "ticker"}])
 
     def getSignal(self, buy_signal: BuySignal) -> SellSignal:
         self.buy_rate = buy_signal.signal['current_rate']  # TODO: replace by info from trade log
@@ -63,6 +63,6 @@ class RelativeRiseSignal(SellSignalGenerator):
             return True
         else:
             print('Prices have not risen back up')
-        # return True
+        return True
         # TODO: Remove above statement
         return False
