@@ -8,6 +8,7 @@ from trades.buy_trade import BuyTrade
 from trades.sell_trade import SellTrade
 
 from risk_allocators.risk_allocator import RiskAllocator
+from utilities.utils import getIndexOfCurrency
 
 
 class SimplePercentageRiskAllocator(RiskAllocator):
@@ -48,13 +49,13 @@ class SimplePercentageRiskAllocator(RiskAllocator):
     def _getAvailableBuy(self):
         accounts = self.auth_client.get_accounts()
         buy_currency = self.product[:3]
-        buy_index = [elem['currency'] for _, elem in enumerate(accounts)].index(buy_currency)
+        idx = getIndexOfCurrency(accounts, buy_currency)
 
-        return float(accounts[buy_index]['available'])
+        return float(accounts[idx]['available'])
 
     def _getAvailableSell(self):
         accounts = self.auth_client.get_accounts()
         sell_currency = self.product[-3:]
-        sell_index = [elem['currency'] for _, elem in enumerate(accounts)].index(sell_currency)
+        idx = getIndexOfCurrency(accounts, sell_currency)
 
-        return float(accounts[sell_index]['available'])
+        return float(accounts[idx]['available'])
