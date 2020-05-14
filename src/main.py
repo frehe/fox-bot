@@ -24,7 +24,7 @@ a.loadPriceData()
 
 # Spawn N strategies
 # Wait until a strategy returns True, spawn a new one
-strategy = RelativeDropStrategy(product, public_client, auth_client, 0.2)
+strategy = RelativeDropStrategy(product, public_client, auth_client, 0.1)
 strategy.execute()
 time.sleep(300)
 strategy.strategy_active = False  # Gracefully end strategy
