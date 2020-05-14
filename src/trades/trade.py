@@ -21,7 +21,16 @@ class Trade(ABC):
         return math.floor(funds * factor) / round(factor)
 
     def _waitUntilSettled(self):
-        while self.trade_info['settled'] is not True:
-            print('Waiting for trade to settle')
-            time.sleep(1)
-            self.trade_info = self.auth_client.get_order(self.trade_info['id'])
+        if 'settled' in self.trade_info:
+            while self.trade_info['settled'] is not True:
+                print('Waiting for trade to settle')
+                time.sleep(1)
+                self.trade_info = self.auth_client.get_order(self.trade_info['id'])
+        else:
+            print(self.trade_info)
+            if self.trade_info['message'] == 'ServiceUnavailable':
+                print('Waiting until service available')
+                time.sleep(10)
+                self._waitUntilSettled()
+            else:
+                raise Exception('Trade could not be completed.')
