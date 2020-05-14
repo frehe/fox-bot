@@ -1,7 +1,10 @@
 import cbpro
+import datetime
 
 from abc import ABC
+
 from utilities.product_infos import ProductInfos
+from utilities.data_handler import DataHandler
 
 
 class Strategy(ABC):
@@ -17,7 +20,12 @@ class Strategy(ABC):
         self.public_client = public_client
         self.auth_client = auth_client
 
+        self.data_handler = None
+
     def execute(self) -> bool:
+        # create history folder to save all output to
+        self._createHistory()
+
         # Refresh information on the traded products
         ProductInfos.refresh(self.public_client, self.product)
 
@@ -29,7 +37,9 @@ class Strategy(ABC):
 
         # Execute the trade
         trade_result = buy_trade.execute()
-        print(trade_result)
+
+        # Log trade
+        self.data_handler.write_trade_history(trade_result)
 
         # Launch sell signal generator and wait for signal
         sell_signal = self.sell_signal_generator.getSignal(buy_signal)
@@ -38,7 +48,15 @@ class Strategy(ABC):
         sell_trade = self.risk_allocator.createSellTrade(sell_signal)
 
         # Execute the trade
-        sell_trade = sell_trade.execute()
-        print(sell_trade)
+        trade_result = sell_trade.execute()
+        
+        self.data_handler.write_trade_history(trade_result)
 
         return True
+
+    def _createHistory(self):
+        dir_path = "../history/past_runs/"
+        now = datetime.datetime.now()
+        timestamp = now.strftime("%Y-%m-%d--%H:%M:%S")
+        dir_path += (timestamp + "/")
+        self.data_handler = DataHandler(dir_path)
