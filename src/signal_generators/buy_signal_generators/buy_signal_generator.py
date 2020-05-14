@@ -24,4 +24,7 @@ class BuySignalGenerator(SignalGenerator):
     def getSignal(self) -> BuySignal:
         pass
 
+    def _printStatus(self):
+        print('Waiting for buy signal')
+
 
