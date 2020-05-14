@@ -1,8 +1,9 @@
 import time
-from datetime import datetime, timezone
 
 from signal_generators.buy_signal_generators.buy_signal_generator import BuySignalGenerator
 from signals.buy_signal import BuySignal
+
+from utilities.utils import UnixToISOTimestamp
 
 
 class RelativeDropSignal(BuySignalGenerator):
@@ -24,11 +25,13 @@ class RelativeDropSignal(BuySignalGenerator):
             public_client, product, timespan)
 
     def getSignal(self) -> BuySignal:
+        self._printStatus()
         while not self.signal:
             self.timestamp = self.public_client.get_time()
             current_epoch = self.timestamp['epoch']
-            past_start_time_iso = datetime.fromtimestamp(current_epoch - self.timespan, tz=timezone.utc).strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3] + 'Z'
-            past_end_time_iso = datetime.fromtimestamp(current_epoch - self.timespan + self.granularity, tz=timezone.utc).strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3] + 'Z'
+            
+            past_start_time_iso = UnixToISOTimestamp(current_epoch - self.timespan)
+            past_end_time_iso = UnixToISOTimestamp(current_epoch - self.timespan + self.granularity)
 
             self.past_rate = self._getRate(past_start_time_iso, past_end_time_iso)
 
