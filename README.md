@@ -1,4 +1,4 @@
-# fox-bot
+# Fox Bot
 
 A modular bot to create trading strategies, backtest and run on any exchange.
 
