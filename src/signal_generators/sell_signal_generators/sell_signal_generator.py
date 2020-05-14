@@ -19,3 +19,6 @@ class SellSignalGenerator(SignalGenerator):
 
     def getSignal(self, buy_signal: BuySignal) -> SellSignal:
         pass
+
+    def _printStatus(self):
+        print('Waiting for sell signal')
