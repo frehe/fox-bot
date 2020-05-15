@@ -2,12 +2,12 @@ import threading
 import time
 import cbpro
 from datetime import datetime, timezone
-from abc import ABC, abstractmethod 
+from abc import ABC
 
 from signal_generators.signal_generator import SignalGenerator
 from signals.buy_signal import BuySignal
 from utilities.secrets import Secrets
-from utilities.my_websocket_client import MyWebsocketClient
+from clients.my_websocket_client import MyWebsocketClient
 
 
 class BuySignalGenerator(SignalGenerator):
