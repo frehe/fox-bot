@@ -1,5 +1,7 @@
-import cbpro
 import time
+
+from clients.auth_clients.cbpro_authenticated_client import CBProAuthenticatedClient
+from clients.public_clients.cbpro_public_client import CBProPublicClient
 
 from strategies.relative_drop_strategy import RelativeDropStrategy
 
@@ -10,11 +12,11 @@ from backtesting.backtest import Backtest
 
 product = 'BTC-EUR'
 
-public_client = cbpro.PublicClient()
-auth_client = cbpro.AuthenticatedClient(
-    Secrets.sandbox_key,
-    Secrets.sandbox_b64secret,
-    Secrets.sandbox_passphrase,
+public_client = CBProPublicClient()
+auth_client = CBProAuthenticatedClient(
+    key=Secrets.sandbox_key,
+    b64secret=Secrets.sandbox_b64secret,
+    passphrase=Secrets.sandbox_passphrase,
     api_url="https://api-public.sandbox.pro.coinbase.com")
 
 
