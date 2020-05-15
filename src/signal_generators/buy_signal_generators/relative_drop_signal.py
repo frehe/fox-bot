@@ -68,7 +68,7 @@ class RelativeDropSignal(BuySignalGenerator):
             return True
         else:
             print('Prices have not dropped')
-        return True
+        # return True
         # TODO: Remove above statement
         return False
 

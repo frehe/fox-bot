@@ -64,6 +64,6 @@ class RelativeRiseSignal(SellSignalGenerator):
             return True
         else:
             print('Prices have not risen back up')
-        return True
+        # return True
         # TODO: Remove above statement
         return False
