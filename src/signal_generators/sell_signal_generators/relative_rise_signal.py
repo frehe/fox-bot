@@ -7,7 +7,7 @@ from signals.sell_signal import SellSignal
 from signal_generators.sell_signal_generators.sell_signal_generator import SellSignalGenerator
 
 from utilities.secrets import Secrets
-from utilities.my_websocket_client import MyWebsocketClient
+from clients.my_websocket_client import MyWebsocketClient
 
 
 class RelativeRiseSignal(SellSignalGenerator):
@@ -64,6 +64,6 @@ class RelativeRiseSignal(SellSignalGenerator):
             return True
         else:
             print('Prices have not risen back up')
-        # return True
+        return True
         # TODO: Remove above statement
         return False

@@ -1,4 +1,4 @@
-from utilities.my_authenticated_client import MyAuthenticatedClient
+from clients.my_authenticated_client import MyAuthenticatedClient
 from pycoingecko import CoinGeckoAPI
 
 from strategies.strategy import Strategy

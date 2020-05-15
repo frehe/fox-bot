@@ -68,7 +68,7 @@ class RelativeDropSignal(BuySignalGenerator):
             return True
         else:
             print('Prices have not dropped')
-        # return True
+        return True
         # TODO: Remove above statement
         return False
 
@@ -76,7 +76,7 @@ class RelativeDropSignal(BuySignalGenerator):
         # get price
         print('getting rates')
         rates = self.public_client.get_product_historic_rates(
-            product_id=self.product,
+            product=self.product,
             start=start,
             end=end,
             granularity=self.granularity)
