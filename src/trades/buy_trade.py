@@ -11,12 +11,14 @@ class BuyTrade(Trade):
     def execute(self):
         self.use_funds = self._round_funds(self.use_funds, self.product[-3:])
         if self.order_type == "market":
-            self.trade_info = self.auth_client.buy(
+            self.trade_info = self.auth_client.buy_taker(
                 self.product,
-                self.order_type,
                 funds=self.use_funds,
             )
             self._waitUntilSettled()
             return self.trade_info
+        elif self.order_type == 'limit':
+            # TODO
+            pass
         else:
             raise Exception('Only market orders supported thus far')
