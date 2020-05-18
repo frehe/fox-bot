@@ -98,7 +98,7 @@ class CBProAuthenticatedClient(MyAuthenticatedClient):
         """
         pass
 
-    def get_order(self, id: str) -> dict:
+    def get_order(self, order_id: str) -> dict:
         """Get updated information on a placed order
 
         Arguments:
@@ -109,4 +109,4 @@ class CBProAuthenticatedClient(MyAuthenticatedClient):
                 'specified_funds', 'executed_value', 'filled_size', 'type',
                 'created_at', 'done_at', 'fill_fees', 'status', 'settled']
         """
-        return self.auth_client.get_order(id)
+        return self.auth_client.get_order(order_id)
