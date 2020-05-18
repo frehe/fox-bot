@@ -20,7 +20,9 @@ auth_client = CBProAuthenticatedClient(
     api_url="https://api-public.sandbox.pro.coinbase.com")
 
 
-a = BacktestingEngine('EUR', 'BTC', '2020-02-20T14:00:00.000000', '2020-02-25T14:00:00.000000', 'GDAX')
+a = BacktestingEngine(
+    '2020-02-20T14:00:00.000000', '2020-02-25T14:00:00.000000', 60,
+    {}, 0.005, 0.005)
 a.loadPriceData()
 
 
