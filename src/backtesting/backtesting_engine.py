@@ -51,8 +51,29 @@ class BacktestingEngine():
                     "profile_id": "backtest",
                 } for currency in self.currencies]
 
+            self._setBalances(balances)
+
             # Orders
             self.orders = []
+
+            # Load market data from start_epoch to end_epoch
+            self._loadPriceData()
+
+        def _loadPriceData(self):
+            coins_list = BacktestingEngine.cg.get_coins_list()
+            buy_currency_id = \
+                getIDOfCurrencyCoinGecko(coins_list, self.buy_currency)
+
+            self.price_data = self.cg.get_coin_market_chart_range_by_id(
+                id=buy_currency_id,
+                vs_currency=self.base_currency.lower(),
+                from_timestamp=self.start_epoch,
+                to_timestamp=self.end_epoch)['prices']
+
+        def _setBalances(self, balances: dict):
+            for key, value in balances.items():
+                idx = getIndexOfCurrency(key)
+                self.accounts[idx]['available'] = str(value)
 
     instance = None
 
@@ -209,14 +230,14 @@ class BacktestingEngine():
     #         from_timestamp=self.start_epoch,
     #         to_timestamp=self.end_epoch)['prices']
 
-    @staticmethod
-    def createAnalysis(strategy: Strategy):
-        """Analyze the performance of a provided strategy.
+    # @staticmethod
+    # def createAnalysis(strategy: Strategy):
+    #     """Analyze the performance of a provided strategy.
 
-        Arguments:
-            strategy {Strategy} -- The strategy to analyze
-        """
-        pass
+    #     Arguments:
+    #         strategy {Strategy} -- The strategy to analyze
+    #     """
+    #     pass
 
     @staticmethod
     def _advance_time() -> bool:
