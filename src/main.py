@@ -7,7 +7,7 @@ from strategies.relative_drop_strategy import RelativeDropStrategy
 
 from utilities.secrets import Secrets
 
-from backtesting.backtest import Backtest
+from backtesting.backtesting_engine import BacktestingEngine
 
 
 product = 'BTC-EUR'
@@ -20,7 +20,7 @@ auth_client = CBProAuthenticatedClient(
     api_url="https://api-public.sandbox.pro.coinbase.com")
 
 
-a = Backtest('EUR', 'BTC', '2020-02-20T14:00:00.000000', '2020-02-25T14:00:00.000000', 'GDAX')
+a = BacktestingEngine('EUR', 'BTC', '2020-02-20T14:00:00.000000', '2020-02-25T14:00:00.000000', 'GDAX')
 a.loadPriceData()
 
 
