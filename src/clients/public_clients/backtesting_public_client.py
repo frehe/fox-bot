@@ -11,6 +11,8 @@ class BacktestingPublicClient(MyPublicClient):
             api_url="backtest_public", timeout=0):
         super(BacktestingPublicClient, self).__init__(api_url, timeout)
 
+        self.Engine = BacktestingEngine
+
     def get_time(self) -> dict:
         """Get current time from server.
 

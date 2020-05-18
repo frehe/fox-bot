@@ -13,7 +13,7 @@ class BacktestingAuthenticatedClient(MyAuthenticatedClient):
         super(BacktestingAuthenticatedClient, self).__init__(
             key, b64secret, passphrase, api_url)
 
-        BacktestingEngine(
+        self.Engine = BacktestingEngine(
             start_time, end_time, granularity, balances, maker_fee, taker_fee)
 
     def get_time(self) -> dict:
