@@ -4,9 +4,17 @@ from datetime import datetime, timezone
 
 
 def getIndexOfCurrency(accounts: list, currency: str) -> int:
+    return _getIndex(accounts, currency, 'currency')
+
+
+def getIndexOfOrder(order_list: list, order: str) -> int:
+    return _getIndex(order_list, order, 'id')
+
+
+def _getIndex(list_of_dicts: list, target_item: str, field: str) -> int:
     return [
-        elem['currency'] for _, elem in enumerate(accounts)
-        ].index(currency)
+        elem[field] for _, elem in enumerate(list_of_dicts)
+        ].index(target_item)
 
 
 def getIDOfCurrencyCoinGecko(coins_list: list, currency: str) -> str:
