@@ -18,10 +18,7 @@ def _getIndex(list_of_dicts: list, target_item: str, field: str) -> int:
 
 
 def getIDOfCurrencyCoinGecko(coins_list: list, currency: str) -> str:
-    idx = [
-        elem['symbol'] for _, elem in enumerate(coins_list)
-        ].index(currency.lower())
-
+    idx = _getIndex(coins_list, currency.lower(), 'symbol')
     return coins_list[idx]['id']
 
 
