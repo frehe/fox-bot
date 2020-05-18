@@ -57,22 +57,11 @@ class BacktestingEngine():
             self.orders = []
 
             # Load market data from start_epoch to end_epoch
-            self._loadPriceData()
-
-        def _loadPriceData(self):
-            coins_list = BacktestingEngine.cg.get_coins_list()
-            buy_currency_id = \
-                getIDOfCurrencyCoinGecko(coins_list, self.buy_currency)
-
-            self.price_data = self.cg.get_coin_market_chart_range_by_id(
-                id=buy_currency_id,
-                vs_currency=self.base_currency.lower(),
-                from_timestamp=self.start_epoch,
-                to_timestamp=self.end_epoch)['prices']
+            self.price_data = []
 
         def _setBalances(self, balances: dict):
             for key, value in balances.items():
-                idx = getIndexOfCurrency(key)
+                idx = getIndexOfCurrency(self.accounts, key)
                 self.accounts[idx]['available'] = str(value)
 
     instance = None
@@ -81,15 +70,29 @@ class BacktestingEngine():
             self, start_time: str, end_time: str, granularity: int,
             balances: dict, maker_fee: float, taker_fee: float):
         if not BacktestingEngine.instance:
-            BacktestingEngine.instance = BacktestingEngine.instance(
+            BacktestingEngine.instance = BacktestingEngine.__BacktestingEngine(
                 start_time, end_time, granularity,
-                balances, maker_fee, taker_fee
-            )
+                balances, maker_fee, taker_fee)
         else:
             raise ValueError("Backtesting Singleton instance already exists.")
 
-    def __getattribute__(self, n):
-        return getattr(self.instance, n)
+    # def __getattribute__(self, n):
+    #     return getattr(self.instance, n)
+
+    @staticmethod
+    def loadPriceData(product: str):
+        buy_currency = product[:3]
+        base_currency = product[-3:]
+        coins_list = BacktestingEngine.instance.cg.get_coins_list()
+        buy_currency_id = \
+            getIDOfCurrencyCoinGecko(coins_list, buy_currency)
+
+        BacktestingEngine.instance.price_data = \
+            BacktestingEngine.instance.cg.get_coin_market_chart_range_by_id(
+                id=buy_currency_id,
+                vs_currency=base_currency.lower(),
+                from_timestamp=BacktestingEngine.instance.start_epoch,
+                to_timestamp=BacktestingEngine.instance.end_epoch)['prices']
 
     @staticmethod
     def get_time() -> int:
@@ -116,8 +119,8 @@ class BacktestingEngine():
         funds = float(funds)
         buy_currency = product_id[:3]
         base_currency = product_id[-3:]
-        buy_account = BacktestingEngine.instance.accounts[getIndexOfCurrency(buy_currency)]
-        base_account = BacktestingEngine.instance.accounts[getIndexOfCurrency(base_currency)]
+        buy_account = BacktestingEngine.instance.accounts[getIndexOfCurrency(BacktestingEngine.instance.accounts, buy_currency)]
+        base_account = BacktestingEngine.instance.accounts[getIndexOfCurrency(BacktestingEngine.instance.accounts, base_currency)]
 
         if side == 'buy':
             # Check if balance is sufficient
@@ -190,7 +193,7 @@ class BacktestingEngine():
 
     @staticmethod
     def get_order(order_id: str):
-        return BacktestingEngine.instance.orders[getIndexOfOrder(order_id)]
+        return BacktestingEngine.instance.orders[getIndexOfOrder(BacktestingEngine.instance.orders, order_id)]
 
     @staticmethod
     def get_currencies():
