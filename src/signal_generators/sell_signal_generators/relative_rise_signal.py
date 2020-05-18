@@ -7,7 +7,7 @@ from signals.sell_signal import SellSignal
 from signal_generators.sell_signal_generators.sell_signal_generator import SellSignalGenerator
 
 from utilities.secrets import Secrets
-from clients.my_websocket_client import MyWebsocketClient
+from clients.websocket_clients.my_websocket_client import MyWebsocketClient
 
 
 class RelativeRiseSignal(SellSignalGenerator):

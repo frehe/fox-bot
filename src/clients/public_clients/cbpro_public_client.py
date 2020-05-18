@@ -1,6 +1,6 @@
 from cbpro.public_client import PublicClient
 
-from clients.my_public_client import MyPublicClient
+from clients.public_clients.my_public_client import MyPublicClient
 
 
 class CBProPublicClient(MyPublicClient):

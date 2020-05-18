@@ -1,4 +1,4 @@
-from clients.my_public_client import MyPublicClient
+from clients.public_clients.my_public_client import MyPublicClient
 
 
 class ProductInfos():

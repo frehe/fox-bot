@@ -1,6 +1,6 @@
 from cbpro.authenticated_client import AuthenticatedClient
 
-from clients.my_authenticated_client import MyAuthenticatedClient
+from clients.auth_clients.my_authenticated_client import MyAuthenticatedClient
 
 
 class CBProAuthenticatedClient(MyAuthenticatedClient):

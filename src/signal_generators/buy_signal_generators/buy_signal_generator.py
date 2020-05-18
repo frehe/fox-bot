@@ -7,7 +7,7 @@ from abc import ABC
 from signal_generators.signal_generator import SignalGenerator
 from signals.buy_signal import BuySignal
 from utilities.secrets import Secrets
-from clients.my_websocket_client import MyWebsocketClient
+from clients.websocket_clients.my_websocket_client import MyWebsocketClient
 
 
 class BuySignalGenerator(SignalGenerator):
