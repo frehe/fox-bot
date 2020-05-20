@@ -124,19 +124,19 @@ class BacktestingEngine():
 
         if side == 'buy':
             # Check if balance is sufficient
-            available_base = base_account['available']
+            available_base = float(base_account['available'])
 
             if available_base < funds:
                 return [{'ErrorMessage': 'Funds are insufficient'}]
 
             # Remove funds from balance
-            base_account['available'] -= funds
+            base_account['available'] = str(available_base - funds)
 
             # Calculate how much is bought and remove fees
             buy_amount = (1.0 * funds) / BacktestingEngine._get_current_rate(product_id)
             fill_fees = BacktestingEngine.instance.maker_fee * buy_amount
             filled_size = buy_amount - fill_fees
-            buy_account['available'] += filled_size
+            buy_account['available'] = str(float(buy_account['available']) + filled_size)
 
             output = {
                 'id': 'backtest_order_' + str(BacktestingEngine.get_time()),
@@ -156,19 +156,19 @@ class BacktestingEngine():
 
         elif side == 'sell':
             # Check if balance is sufficient
-            available_buy = buy_account['available']
+            available_buy = float(buy_account['available'])
 
-            if available_buy < funds:
+            if float(available_buy) < funds:
                 return [{'ErrorMessage': 'Funds are insufficient'}]
 
             # Remove funds from balance
-            buy_account['available'] -= funds
+            buy_account['available'] = str(available_buy - funds)
 
             # Calculate how much is bought and remove fees
             base_amount = 1.0 * funds * BacktestingEngine._get_current_rate(product_id)
             fill_fees = BacktestingEngine.instance.maker_fee * base_amount
             filled_size = base_amount - fill_fees
-            base_account['available'] += filled_size
+            base_account['available'] = str(float(base_account['available']) + filled_size)
 
             output = {
                 'id': 'backtest_order_' + str(BacktestingEngine.get_time()),
@@ -198,7 +198,7 @@ class BacktestingEngine():
     @staticmethod
     def get_currencies():
         return CurrenciesDetail.detail
-    
+
     @staticmethod
     def get_product_24hr_stats(product: str):
         """Obtain 24hr stats of a given product
@@ -267,4 +267,10 @@ class BacktestingEngine():
         Returns:
             float -- exchange rate: price in base currency
         """
-        pass
+        return BacktestingEngine.instance.price_data[
+            BacktestingEngine.instance.current_epoch
+            - BacktestingEngine.instance.start_epoch][1]
+
+    @staticmethod
+    def _get_closest_relative_epoch(epoch: int) -> int:
+        return 0

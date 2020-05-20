@@ -1,9 +1,13 @@
 import time
 
-from clients.auth_clients.cbpro_authenticated_client import CBProAuthenticatedClient
-from clients.public_clients.cbpro_public_client import CBProPublicClient
-from clients.auth_clients.backtesting_authenticated_client import BacktestingAuthenticatedClient
-from clients.public_clients.backtesting_public_client import BacktestingPublicClient
+from clients.auth_clients.cbpro_authenticated_client \
+    import CBProAuthenticatedClient
+from clients.public_clients.cbpro_public_client \
+    import CBProPublicClient
+from clients.auth_clients.backtesting_authenticated_client \
+    import BacktestingAuthenticatedClient
+from clients.public_clients.backtesting_public_client \
+    import BacktestingPublicClient
 
 from strategies.relative_drop_strategy import RelativeDropStrategy
 
