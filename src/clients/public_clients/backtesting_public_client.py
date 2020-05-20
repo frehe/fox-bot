@@ -6,12 +6,8 @@ from utilities.utils import UnixToISOTimestamp
 
 
 class BacktestingPublicClient(MyPublicClient):
-    def __init__(
-            self, start_time: str, end_time: str, granularity: int,
-            api_url="backtest_public", timeout=0):
+    def __init__(self, api_url="backtest_public", timeout=0):
         super(BacktestingPublicClient, self).__init__(api_url, timeout)
-
-        self.Engine = BacktestingEngine
 
     def get_time(self) -> dict:
         """Get current time from server.
@@ -29,6 +25,9 @@ class BacktestingPublicClient(MyPublicClient):
             'iso': current_iso,
             'epoch': current_epoch
         }
+
+    def advance_time(self, granularity=None):
+        BacktestingEngine.advance_time()
 
     def get_currencies(self) -> list:
         """List all known currencies.
@@ -70,7 +69,7 @@ class BacktestingPublicClient(MyPublicClient):
                 duration of granularity
         """
         return BacktestingEngine.get_product_historic_rates(
-            product_id=product,
+            product=product,
             start=start,
             end=end,
             granularity=granularity

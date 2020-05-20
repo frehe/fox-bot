@@ -1,9 +1,7 @@
 from pycoingecko import CoinGeckoAPI
-
-from strategies.strategy import Strategy
 from utilities.utils import \
     getIDOfCurrencyCoinGecko, UnixToISOTimestamp, ISOToUnixTimestamp, \
-    getIndexOfCurrency, getIndexOfOrder
+    getIndexOfCurrency, getIndexOfOrder, getIndexOfClosestEpoch
 from utilities.enums import Currencies, CurrenciesDetail
 
 
@@ -19,21 +17,21 @@ class BacktestingEngine():
             Arguments:
                 start_time {int} -- ISO 8601
                 end_time {int} -- ISO 8601
-                granularity {int} -- Collect backtesting data with this granularity.
+                granularity {int} -- Collect backtesting data with
+                                        this granularity in seconds
                 balances {dict} -- Init wallets with these balances
-                                    e.g. {'BTC': '100.000', ...}
+                                        e.g. {'BTC': '100.000', ...}
             """
-
             self.time_grid = []
-            self.granularity = granularity  # TODO: Write a data loader that provides a desired granularity.
+            # TODO: Write a data loader that provides a desired granularity
+            self.granularity = granularity
 
-            self.price_data = None
             self.cg = CoinGeckoAPI()
 
             # Convert start and end dates to epoch
             self.start_epoch = int(ISOToUnixTimestamp(start_time))
             self.end_epoch = int(ISOToUnixTimestamp(end_time))
-            self.current_epoch = self.start_epoch
+            self.current_relative_epochs = {}
 
             # Fees
             self.maker_fee = maker_fee
@@ -57,7 +55,10 @@ class BacktestingEngine():
             self.orders = []
 
             # Load market data from start_epoch to end_epoch
-            self.price_data = []
+            self.price_data = {}
+
+            # Set active product
+            self.active_product = ""
 
         def _setBalances(self, balances: dict):
             for key, value in balances.items():
@@ -80,23 +81,23 @@ class BacktestingEngine():
     #     return getattr(self.instance, n)
 
     @staticmethod
-    def loadPriceData(product: str):
-        buy_currency = product[:3]
-        base_currency = product[-3:]
-        coins_list = BacktestingEngine.instance.cg.get_coins_list()
-        buy_currency_id = \
-            getIDOfCurrencyCoinGecko(coins_list, buy_currency)
+    def clearPriceData(product: str):
+        BacktestingEngine.instance.price_data.pop(product, None)
+        BacktestingEngine.instance.current_relative_epochs.pop(product, None)
 
-        BacktestingEngine.instance.price_data = \
-            BacktestingEngine.instance.cg.get_coin_market_chart_range_by_id(
-                id=buy_currency_id,
-                vs_currency=base_currency.lower(),
-                from_timestamp=BacktestingEngine.instance.start_epoch,
-                to_timestamp=BacktestingEngine.instance.end_epoch)['prices']
+    @staticmethod
+    def activateProduct(product: str):
+        if product not in BacktestingEngine.instance.price_data:
+            BacktestingEngine._loadPriceData(product)
+        BacktestingEngine.instance.active_product = product
 
     @staticmethod
     def get_time() -> int:
-        return BacktestingEngine.instance.current_epoch
+        return BacktestingEngine.instance.price_data[
+            BacktestingEngine.instance.active_product][
+                BacktestingEngine.instance.current_relative_epochs[
+                    BacktestingEngine.instance.active_product]][
+                0]
 
     @staticmethod
     def get_accounts() -> list:
@@ -119,8 +120,10 @@ class BacktestingEngine():
         funds = float(funds)
         buy_currency = product_id[:3]
         base_currency = product_id[-3:]
-        buy_account = BacktestingEngine.instance.accounts[getIndexOfCurrency(BacktestingEngine.instance.accounts, buy_currency)]
-        base_account = BacktestingEngine.instance.accounts[getIndexOfCurrency(BacktestingEngine.instance.accounts, base_currency)]
+        buy_account = BacktestingEngine.instance.accounts[getIndexOfCurrency(
+            BacktestingEngine.instance.accounts, buy_currency)]
+        base_account = BacktestingEngine.instance.accounts[getIndexOfCurrency(
+            BacktestingEngine.instance.accounts, base_currency)]
 
         if side == 'buy':
             # Check if balance is sufficient
@@ -133,10 +136,20 @@ class BacktestingEngine():
             base_account['available'] = str(available_base - funds)
 
             # Calculate how much is bought and remove fees
-            buy_amount = (1.0 * funds) / BacktestingEngine._get_current_rate(product_id)
-            fill_fees = BacktestingEngine.instance.maker_fee * buy_amount
-            filled_size = buy_amount - fill_fees
-            buy_account['available'] = str(float(buy_account['available']) + filled_size)
+            buy_amount = \
+                (1.0 * funds) / BacktestingEngine._get_rate(
+                    product_id,
+                    BacktestingEngine._relative_to_absolute_epoch(
+                        product_id,
+                        BacktestingEngine.instance.current_relative_epochs[
+                            BacktestingEngine.instance.active_product]
+                    ))
+            fill_fees = \
+                BacktestingEngine.instance.maker_fee * buy_amount
+            filled_size = \
+                buy_amount - fill_fees
+            buy_account['available'] = \
+                str(float(buy_account['available']) + filled_size)
 
             output = {
                 'id': 'backtest_order_' + str(BacktestingEngine.get_time()),
@@ -165,10 +178,14 @@ class BacktestingEngine():
             buy_account['available'] = str(available_buy - funds)
 
             # Calculate how much is bought and remove fees
-            base_amount = 1.0 * funds * BacktestingEngine._get_current_rate(product_id)
-            fill_fees = BacktestingEngine.instance.maker_fee * base_amount
-            filled_size = base_amount - fill_fees
-            base_account['available'] = str(float(base_account['available']) + filled_size)
+            base_amount = \
+                1.0 * funds * BacktestingEngine._get_current_rate(product_id)
+            fill_fees = \
+                BacktestingEngine.instance.maker_fee * base_amount
+            filled_size = \
+                base_amount - fill_fees
+            base_account['available'] = \
+                str(float(base_account['available']) + filled_size)
 
             output = {
                 'id': 'backtest_order_' + str(BacktestingEngine.get_time()),
@@ -193,11 +210,12 @@ class BacktestingEngine():
 
     @staticmethod
     def get_order(order_id: str):
-        return BacktestingEngine.instance.orders[getIndexOfOrder(BacktestingEngine.instance.orders, order_id)]
+        return BacktestingEngine.instance.orders[
+            getIndexOfOrder(BacktestingEngine.instance.orders, order_id)]
 
     @staticmethod
     def get_currencies():
-        return CurrenciesDetail.detail
+        return CurrenciesDetail.detail.value
 
     @staticmethod
     def get_product_24hr_stats(product: str):
@@ -206,59 +224,125 @@ class BacktestingEngine():
         Arguments:
             product {str} -- [description]
         """
-        pass
+        # Get closest relative epoch of 24 hrs ago
+        current_epoch = \
+            BacktestingEngine.instance.current_relative_epochs[product]
+        past_epoch = \
+            BacktestingEngine._absolute_to_relative_epoch(
+                product,
+                BacktestingEngine._relative_to_absolute_epoch(
+                    product, current_epoch) - 24 * 60 * 60)  # go back 24 hrs
+        open_rate = BacktestingEngine._get_rate(product, past_epoch)
+        close_rate = BacktestingEngine._get_rate(product, current_epoch)
+        max_rate = max([
+            entry[1] for entry in
+            BacktestingEngine.instance.price_data[product][
+                past_epoch:current_epoch + 1]
+            ])
+        min_rate = min([
+            entry[1] for entry in
+            BacktestingEngine.instance.price_data[product][
+                past_epoch:current_epoch + 1]]
+            )
+
+        return {
+            'open': str(open_rate),
+            'last': str(close_rate),
+            'high': str(max_rate),
+            'low': str(min_rate),
+            'volume': "NaN"
+        }
 
     @staticmethod
     def get_product_historic_rates(
-            product_id: str, start: str, end: str, granularity: int):
+            product: str, start: str, end: str, granularity: int) -> list:
         """Obtain a list of historic rate buckets.
 
         Arguments:
-            product_id {str} -- [description]
-            start {str} -- [description]
-            end {str} -- [description]
+            product {str} -- [description]
+            start {str} -- ISO time
+            end {str} -- ISO time
             granularity {int} -- [description]
+
+        Returns:
+            list -- List of buckets. Each bucket contains data
+                [time, low, high, open, close, volume] for the
+                duration of granularity
         """
-        pass
+        assert granularity == BacktestingEngine.instance.granularity, \
+            "Granularity of backtesting engine and desired rates do not match"
 
-    # @staticmethod
-    # def loadPriceData():
-    #     coins_list = BacktestingEngine.cg.get_coins_list()
-    #     buy_currency_id = \
-    #         getIDOfCurrencyCoinGecko(coins_list, self.buy_currency)
+        # Convert ISO times to Unix epochs
+        start_epoch = int(ISOToUnixTimestamp(start))
+        end_epoch = int(ISOToUnixTimestamp(end))
 
-    #     self.price_data = self.cg.get_coin_market_chart_range_by_id(
-    #         id=buy_currency_id,
-    #         vs_currency=self.base_currency.lower(),
-    #         from_timestamp=self.start_epoch,
-    #         to_timestamp=self.end_epoch)['prices']
+        start_epoch_relative = BacktestingEngine._absolute_to_relative_epoch(product, start_epoch)
+        end_epoch_relative = BacktestingEngine._absolute_to_relative_epoch(product, end_epoch)
 
-    # @staticmethod
-    # def createAnalysis(strategy: Strategy):
-    #     """Analyze the performance of a provided strategy.
+        result = []
 
-    #     Arguments:
-    #         strategy {Strategy} -- The strategy to analyze
-    #     """
-    #     pass
+        for i, entry in enumerate(BacktestingEngine.instance.price_data[
+                product][start_epoch_relative:end_epoch_relative + 1]):
+            open_rate = entry[1]
+            close_rate = \
+                BacktestingEngine.instance.price_data[product][i + 1][1]
+            result.append([
+                BacktestingEngine._relative_to_absolute_epoch(product, i),
+                max(open_rate, close_rate),
+                min(open_rate, close_rate),
+                open_rate,
+                close_rate,
+                None
+            ])
+        
+        return result
 
     @staticmethod
-    def _advance_time() -> bool:
+    def _loadPriceData(product: str):
+        print('Loading price data for backtest on pair: ' + product)
+        buy_currency = product[:3]
+        base_currency = product[-3:]
+        coins_list = BacktestingEngine.instance.cg.get_coins_list()
+        buy_currency_id = \
+            getIDOfCurrencyCoinGecko(coins_list, buy_currency)
+
+        # TODO: Load with BaktestingEngine.instance.granularity
+        prices = \
+            BacktestingEngine.instance.cg \
+            .get_coin_market_chart_range_by_id(
+                id=buy_currency_id,
+                vs_currency=base_currency.lower(),
+                from_timestamp=BacktestingEngine.instance.start_epoch,
+                to_timestamp=BacktestingEngine.instance.end_epoch
+            )['prices']
+
+        for i, elem in enumerate(prices):
+            elem[0] = int(elem[0] / 1000.)
+
+        BacktestingEngine.instance.price_data[product] = prices
+
+        BacktestingEngine.instance.current_relative_epochs[product] = 0
+
+    @staticmethod
+    def advance_time() -> bool:
         """Simulate the progression of time.
+
+        Arguments:
+            product {str} -- e.g. 'BTC-EUR'
 
         Returns:
             bool -- True if end epoch reached, otherwise False.
         """
-        BacktestingEngine.instance.current_epoch \
-            += BacktestingEngine.instance.granularity
+        product = BacktestingEngine.instance.active_product
+        BacktestingEngine.instance.current_relative_epochs[product] += 1
 
-        if (BacktestingEngine.instance.current_epoch
-                >= BacktestingEngine.instance.end_epoch):
+        if (BacktestingEngine.instance.current_relative_epochs[product]
+                >= len(BacktestingEngine.instance.price_data[product])):
             return True
         return False
 
     @staticmethod
-    def _get_current_rate(produt: str) -> float:
+    def _get_rate(product: str, abs_epoch: int) -> float:
         """Return the exchange rate at the current timepoint in simulation.
 
         Arguments:
@@ -267,10 +351,34 @@ class BacktestingEngine():
         Returns:
             float -- exchange rate: price in base currency
         """
-        return BacktestingEngine.instance.price_data[
-            BacktestingEngine.instance.current_epoch
-            - BacktestingEngine.instance.start_epoch][1]
+        return BacktestingEngine.instance.price_data[product][
+            BacktestingEngine._absolute_to_relative_epoch(product, abs_epoch)
+        ][1]
 
     @staticmethod
-    def _get_closest_relative_epoch(epoch: int) -> int:
-        return 0
+    def _relative_to_absolute_epoch(product: str, rel_epoch: int) -> int:
+        """[summary]
+
+        Arguments:
+            product {str} -- [description]
+            rel_epoch {int} -- Relative index in price_data
+
+        Returns:
+            int -- UNIX-formatted epoch corresponding to the absolute time
+        """
+        return BacktestingEngine.instance.price_data[product][rel_epoch][0]
+
+    @staticmethod
+    def _absolute_to_relative_epoch(product: str, abs_epoch: int):
+        """[summary]
+
+        Arguments:
+            product {str} -- [description]
+            abs_epoch {int} -- A timepoint in the past, UNIX-formatted
+
+        Returns:
+            [type] -- the array index of the closest timepoint in price_data
+        """
+        return getIndexOfClosestEpoch(
+            BacktestingEngine.instance.price_data[product],
+            abs_epoch)

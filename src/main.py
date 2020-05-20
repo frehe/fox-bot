@@ -13,8 +13,6 @@ from strategies.relative_drop_strategy import RelativeDropStrategy
 
 from utilities.secrets import Secrets
 
-from backtesting.backtesting_engine import BacktestingEngine
-
 
 product = 'BTC-EUR'
 
@@ -25,18 +23,20 @@ auth_client = CBProAuthenticatedClient(
     api_url="https://api-public.sandbox.pro.coinbase.com")
 public_client = CBProPublicClient()
 
-auth_client = BacktestingAuthenticatedClient(
-    '2020-02-20T14:00:00.000000', '2020-02-25T14:00:00.000000',
-    60, {'EUR': 60.0}, 0.005, 0.005)
-
-auth_client.Engine.loadPriceData('BTC-EUR')
-
-
+auth_client = BacktestingAuthenticatedClient()
+public_client = BacktestingPublicClient()
 
 # Spawn N strategies
 # Wait until a strategy returns True, spawn a new one
 strategy = RelativeDropStrategy(product, public_client, auth_client, 0.1)
-strategy.execute()
+strategy.backtest(
+    '2020-02-20T14:00:00.000000',
+    '2020-02-25T14:00:00.000000',
+    60,
+    {'EUR': 60.0},
+    0.005,
+    0.005
+)
 time.sleep(300)
 strategy.strategy_active = False  # Gracefully end strategy
 print('Strategy done')

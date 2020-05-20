@@ -1,3 +1,5 @@
+import time
+
 from abc import ABC
 
 
@@ -20,6 +22,14 @@ class MyPublicClient(ABC):
                 }
         """
         pass
+
+    def advance_time(self, granularity: int):
+        """Advance time by a given number of seconds.
+
+        Arguments:
+            granularity {int} -- [description]
+        """
+        time.sleep(granularity)
 
     def get_currencies(self) -> list:
         """List all known currencies.

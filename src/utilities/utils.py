@@ -11,15 +11,23 @@ def getIndexOfOrder(order_list: list, order: str) -> int:
     return _getIndex(order_list, order, 'id')
 
 
+def getIDOfCurrencyCoinGecko(coins_list: list, currency: str) -> str:
+    idx = _getIndex(coins_list, currency.lower(), 'symbol')
+    return coins_list[idx]['id']
+
+
+def getIndexOfClosestEpoch(price_data: list, abs_epoch: int) -> int:
+    closest_index = 0
+    for i, entry in enumerate(price_data):
+        if abs(entry[0] - abs_epoch) < abs(price_data[closest_index][0] - abs_epoch):
+            closest_index = i
+    return closest_index
+
+
 def _getIndex(list_of_dicts: list, target_item: str, field: str) -> int:
     return [
         elem[field] for _, elem in enumerate(list_of_dicts)
         ].index(target_item)
-
-
-def getIDOfCurrencyCoinGecko(coins_list: list, currency: str) -> str:
-    idx = _getIndex(coins_list, currency.lower(), 'symbol')
-    return coins_list[idx]['id']
 
 
 def UnixToISOTimestamp(unix_time: float) -> str:

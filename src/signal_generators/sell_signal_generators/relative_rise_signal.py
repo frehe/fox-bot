@@ -39,15 +39,17 @@ class RelativeRiseSignal(SellSignalGenerator):
         self._printStatus()
         self.buy_rate = buy_signal.signal['current_rate']  # TODO: replace by info from trade log
 
+        # TODO: replace with standard price queries as with buy-signals
         self.wsClient.start()
         while not self.signal:
             # Get current price from websocket
             self.current_rate = self.wsClient.latest_msg
             if self.current_rate is not None:
                 self.signal = self._relativeRiseSignal()
-            
-            time.sleep(self.granularity)
-        
+
+            # time.sleep(self.granularity)
+            self.public_client.advance_time(self.granularity)
+
         self.wsClient.close()
         sell_signal = SellSignal()
         sell_signal.signal['activated'] = True

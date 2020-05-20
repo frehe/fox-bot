@@ -7,14 +7,10 @@ from utilities.utils import UnixToISOTimestamp
 
 class BacktestingAuthenticatedClient(MyAuthenticatedClient):
     def __init__(
-            self, start_time: str, end_time: str, granularity: int,
-            balances: dict, maker_fee: float, taker_fee: float,
-            key="", b64secret="", passphrase="", api_url="backtest_auth"):
+            self, key="", b64secret="", passphrase="",
+            api_url="backtest_auth"):
         super(BacktestingAuthenticatedClient, self).__init__(
             key, b64secret, passphrase, api_url)
-
-        self.Engine = BacktestingEngine(
-            start_time, end_time, granularity, balances, maker_fee, taker_fee)
 
     def get_time(self) -> dict:
         """[summary]

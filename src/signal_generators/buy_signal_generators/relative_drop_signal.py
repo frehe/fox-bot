@@ -1,5 +1,3 @@
-import time
-
 from signal_generators.buy_signal_generators.buy_signal_generator import BuySignalGenerator
 from signals.buy_signal import BuySignal
 
@@ -29,7 +27,7 @@ class RelativeDropSignal(BuySignalGenerator):
         while not self.signal:
             self.timestamp = self.public_client.get_time()
             current_epoch = self.timestamp['epoch']
-            
+
             past_start_time_iso = UnixToISOTimestamp(current_epoch - self.timespan)
             past_end_time_iso = UnixToISOTimestamp(current_epoch - self.timespan + self.granularity)
 
@@ -43,7 +41,7 @@ class RelativeDropSignal(BuySignalGenerator):
 
             self.signal = self._relativeDropSignal()
 
-            time.sleep(self.granularity)
+            self.public_client.advance_time(self.granularity)
 
         buy_signal = BuySignal()
         buy_signal.signal['activated'] = True
