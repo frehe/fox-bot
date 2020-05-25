@@ -2,7 +2,7 @@ import os
 import csv
 
 from trades.trade import Trade
-from clients.my_authenticated_client import MyAuthenticatedClient
+from clients.auth_clients.my_authenticated_client import MyAuthenticatedClient
 
 from utilities.utils import getIndexOfCurrency, ISOToUnixTimestamp
 

@@ -1,22 +1,16 @@
-from cbpro.authenticated_client import AuthenticatedClient
-
 from clients.auth_clients.my_authenticated_client import MyAuthenticatedClient
 
+from backtesting.backtesting_engine import BacktestingEngine
 
-class CBProAuthenticatedClient(MyAuthenticatedClient):
+from utilities.utils import UnixToISOTimestamp
+
+
+class BacktestingAuthenticatedClient(MyAuthenticatedClient):
     def __init__(
-            self, key: str, b64secret: str, passphrase: str,
-            api_url="https://api.pro.coinbase.com"):
-
-        super(CBProAuthenticatedClient, self).__init__(
+            self, key="", b64secret="", passphrase="",
+            api_url="backtest_auth"):
+        super(BacktestingAuthenticatedClient, self).__init__(
             key, b64secret, passphrase, api_url)
-
-        self.auth_client = AuthenticatedClient(
-            key=key,
-            b64secret=b64secret,
-            passphrase=passphrase,
-            api_url=api_url
-        )
 
     def get_time(self) -> dict:
         """[summary]
@@ -27,7 +21,13 @@ class CBProAuthenticatedClient(MyAuthenticatedClient):
                 'epoch': UNIX epoch
                 }
         """
-        return self.auth_client.get_time()
+        current_epoch = BacktestingEngine.get_time()
+        current_iso = UnixToISOTimestamp(current_epoch)
+
+        return {
+            'iso': current_iso,
+            'epoch': current_epoch
+        }
 
     def get_accounts(self) -> list:
         """Get a summary of all accounts with different currencies.
@@ -36,7 +36,7 @@ class CBProAuthenticatedClient(MyAuthenticatedClient):
             list -- List of dicts containing keys
                             ['id', 'currency' 'balance', 'available']
         """
-        return self.auth_client.get_accounts()
+        return BacktestingEngine.get_accounts()
 
     def buy_taker(self, product: str, funds: str) -> dict:
         """Issue a buy order on the taker (market) side.
@@ -50,7 +50,7 @@ class CBProAuthenticatedClient(MyAuthenticatedClient):
                 'specified_funds', 'executed_value', 'filled_size', 'type',
                 'created_at', 'done_at', 'fill_fees', 'status', 'settled']
         """
-        return self.auth_client.place_market_order(
+        return BacktestingEngine.placeMarketOrder(
             product_id=product,
             side='buy',
             funds=funds
@@ -79,10 +79,10 @@ class CBProAuthenticatedClient(MyAuthenticatedClient):
         Returns:
             dict -- [description]
         """
-        return self.auth_client.place_market_order(
+        return BacktestingEngine.placeMarketOrder(
             product_id=product,
             side='sell',
-            size=size
+            funds=size
         )
 
     def sell_maker(self, product: str, price: str, size: str) -> dict:
@@ -102,11 +102,11 @@ class CBProAuthenticatedClient(MyAuthenticatedClient):
         """Get updated information on a placed order
 
         Arguments:
-            id {str} -- The id by with to identify the order.
+            order_id {str} -- The id by with to identify the order.
 
         Returns:
             dict -- Dictionary with keys ['id', 'product_id', 'side', 'funds',
                 'specified_funds', 'executed_value', 'filled_size', 'type',
                 'created_at', 'done_at', 'fill_fees', 'status', 'settled']
         """
-        return self.auth_client.get_order(order_id)
+        return BacktestingEngine.get_order(order_id)

@@ -83,11 +83,11 @@ class MyAuthenticatedClient(ABC):
         """
         pass
 
-    def get_order(self, id: str) -> dict:
+    def get_order(self, order_id: str) -> dict:
         """Get updated information on a placed order
 
         Arguments:
-            id {str} -- The id by with to identify the order.
+            order_id {str} -- The id by with to identify the order.
 
         Returns:
             dict -- Dictionary with keys ['id', 'product_id', 'side', 'funds',

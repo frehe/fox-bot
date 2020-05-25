@@ -4,28 +4,43 @@ from datetime import datetime, timezone
 
 
 def getIndexOfCurrency(accounts: list, currency: str) -> int:
-    return [
-        elem['currency'] for _, elem in enumerate(accounts)
-        ].index(currency)
+    return _getIndex(accounts, currency, 'currency')
+
+
+def getIndexOfOrder(order_list: list, order: str) -> int:
+    return _getIndex(order_list, order, 'id')
 
 
 def getIDOfCurrencyCoinGecko(coins_list: list, currency: str) -> str:
-    idx = [
-        elem['symbol'] for _, elem in enumerate(coins_list)
-        ].index(currency.lower())
-
+    idx = _getIndex(coins_list, currency.lower(), 'symbol')
     return coins_list[idx]['id']
+
+
+def getIndexOfClosestEpoch(price_data: list, abs_epoch: int) -> int:
+    closest_index = 0
+    for i, entry in enumerate(price_data):
+        if abs(entry[0] - abs_epoch) < abs(price_data[closest_index][0] - abs_epoch):
+            closest_index = i
+    return closest_index
+
+
+def _getIndex(list_of_dicts: list, target_item: str, field: str) -> int:
+    return [
+        elem[field] for _, elem in enumerate(list_of_dicts)
+        ].index(target_item)
 
 
 def UnixToISOTimestamp(unix_time: float) -> str:
     """Convert the unix epoch time into a ISO8601-formatted date.
 
     Arguments:
-        unix_time {str} -- [description]
+        unix_time {int} -- [description]
 
     Returns:
         str -- [description]
     """
+    if isinstance(unix_time, str):
+        unix_time = int(unix_time)
     return datetime.fromtimestamp(unix_time, tz=timezone.utc)\
         .strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3] + 'Z'
 

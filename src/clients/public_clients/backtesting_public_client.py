@@ -1,14 +1,13 @@
-from abc import ABC
+from clients.public_clients.my_public_client import MyPublicClient
+
+from backtesting.backtesting_engine import BacktestingEngine
+
+from utilities.utils import UnixToISOTimestamp
 
 
-class MyPublicClient(ABC):
-    def __init__(self, api_url, timeout):
-        super(MyPublicClient, self).__init__()
-
-        self.api_url = api_url
-        self.timeout = timeout
-
-        self.public_client = None
+class BacktestingPublicClient(MyPublicClient):
+    def __init__(self, api_url="backtest_public", timeout=0):
+        super(BacktestingPublicClient, self).__init__(api_url, timeout)
 
     def get_time(self) -> dict:
         """Get current time from server.
@@ -19,7 +18,16 @@ class MyPublicClient(ABC):
                 'epoch': UNIX epoch
                 }
         """
-        pass
+        current_epoch = BacktestingEngine.get_time()
+        current_iso = UnixToISOTimestamp(current_epoch)
+
+        return {
+            'iso': current_iso,
+            'epoch': current_epoch
+        }
+
+    def advance_time(self, granularity=None):
+        BacktestingEngine.advance_time()
 
     def get_currencies(self) -> list:
         """List all known currencies.
@@ -31,7 +39,7 @@ class MyPublicClient(ABC):
                 ...
                 ]
         """
-        pass
+        return BacktestingEngine.get_currencies()
 
     def get_product_24hr_stats(self, product: str) -> dict:
         """Get 24hr stats of a given product.
@@ -42,7 +50,7 @@ class MyPublicClient(ABC):
         Returns:
             dict -- Dict containing keys 'open', 'high', 'low', 'volume', 'last'
         """
-        pass
+        return BacktestingEngine.get_product_24hr_stats(product)
 
     def get_product_historic_rates(
             self, product: str, start: str,
@@ -60,4 +68,9 @@ class MyPublicClient(ABC):
                 [time, low, high, open, close, volume] for the
                 duration of granularity
         """
-        pass
+        return BacktestingEngine.get_product_historic_rates(
+            product=product,
+            start=start,
+            end=end,
+            granularity=granularity
+        )

@@ -1,13 +1,16 @@
-from cbpro.public_client import PublicClient
+import time
 
-from clients.public_clients.my_public_client import MyPublicClient
+from abc import ABC
 
 
-class CBProPublicClient(MyPublicClient):
-    def __init__(self, api_url='https://api.pro.coinbase.com', timeout=30):
-        super(CBProPublicClient, self).__init__(api_url, timeout)
+class MyPublicClient(ABC):
+    def __init__(self, api_url, timeout):
+        super(MyPublicClient, self).__init__()
 
-        self.public_client = PublicClient(api_url, timeout)
+        self.api_url = api_url
+        self.timeout = timeout
+
+        self.public_client = None
 
     def get_time(self) -> dict:
         """Get current time from server.
@@ -18,7 +21,15 @@ class CBProPublicClient(MyPublicClient):
                 'epoch': UNIX epoch
                 }
         """
-        return self.public_client.get_time()
+        pass
+
+    def advance_time(self, granularity: int):
+        """Advance time by a given number of seconds.
+
+        Arguments:
+            granularity {int} -- [description]
+        """
+        time.sleep(granularity)
 
     def get_currencies(self) -> list:
         """List all known currencies.
@@ -30,7 +41,7 @@ class CBProPublicClient(MyPublicClient):
                 ...
                 ]
         """
-        return self.public_client.get_currencies()
+        pass
 
     def get_product_24hr_stats(self, product: str) -> dict:
         """Get 24hr stats of a given product.
@@ -41,7 +52,7 @@ class CBProPublicClient(MyPublicClient):
         Returns:
             dict -- Dict containing keys 'open', 'high', 'low', 'volume', 'last'
         """
-        return self.public_client.get_product_24hr_stats(product)
+        pass
 
     def get_product_historic_rates(
             self, product: str, start: str,
@@ -59,9 +70,4 @@ class CBProPublicClient(MyPublicClient):
                 [time, low, high, open, close, volume] for the
                 duration of granularity
         """
-        return self.public_client.get_product_historic_rates(
-            product_id=product,
-            start=start,
-            end=end,
-            granularity=granularity
-        )
+        pass
