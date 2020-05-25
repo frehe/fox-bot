@@ -12,7 +12,7 @@ class DataHandler():
         self.dir_path = dir_path
         os.makedirs(self.dir_path)
         self.trade_history = None
-        self.trade_history_filename = self.dir_path + "trade_history.csv"
+        self.trade_history_filename = self.dir_path + "/trade_history.csv"
         self.trade_history_columns = \
             ['timestamp', 'id', 'product_id', 'side', 'funds',
                 'specified_funds', 'executed_value', 'filled_size', 'type',
@@ -27,7 +27,7 @@ class DataHandler():
             self.trade_writer.writeheader()
 
         self.balance_history = None
-        self.balance_history_filename = self.dir_path + "balance_history.csv"
+        self.balance_history_filename = self.dir_path + "/balance_history.csv"
         self.balance_history_columns = \
             ['timestamp', 'id', 'currency', 'balance', 'available']
 
