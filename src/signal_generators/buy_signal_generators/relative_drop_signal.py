@@ -18,13 +18,15 @@ class RelativeDropSignal(BuySignalGenerator):
         """
         self.drop_percentage = drop_percentage
         self.max_price_percentage = max_price_percentage
-        self.granularity = 60  # {60, 300, 900, 3600, 21600, 86400}
+        self.granularity = 3600  # {60, 300, 900, 3600, 21600, 86400}
         super(RelativeDropSignal, self).__init__(
             public_client, product, timespan)
 
     def getSignal(self) -> BuySignal:
         self._printStatus()
-        while not self.signal:
+        signal = False
+        
+        while not signal:
             self.timestamp = self.public_client.get_time()
             current_epoch = self.timestamp['epoch']
 
@@ -39,7 +41,7 @@ class RelativeDropSignal(BuySignalGenerator):
             self.day_low = float(day_stats['low'])
             self.day_high = float(day_stats['high'])
 
-            self.signal = self._relativeDropSignal()
+            signal = self._relativeDropSignal()
 
             self.public_client.advance_time(self.granularity)
 
@@ -66,7 +68,7 @@ class RelativeDropSignal(BuySignalGenerator):
             return True
         else:
             print('Prices have not dropped')
-        return True
+        # return True
         # TODO: Remove above statement
         return False
 
