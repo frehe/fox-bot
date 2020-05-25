@@ -143,11 +143,9 @@ class BacktestingEngine():
             buy_amount = \
                 (1.0 * funds) / BacktestingEngine._get_rate(
                     product_id,
-                    BacktestingEngine._relative_to_absolute_epoch(
-                        product_id,
-                        BacktestingEngine.instance.current_relative_epochs[
-                            BacktestingEngine.instance.active_product]
-                    ))
+                    BacktestingEngine.instance.current_relative_epochs[
+                        BacktestingEngine.instance.active_product]
+                    )
             fill_fees = \
                 BacktestingEngine.instance.maker_fee * buy_amount
             filled_size = \
@@ -185,11 +183,9 @@ class BacktestingEngine():
             base_amount = \
                 1.0 * funds * BacktestingEngine._get_rate(
                     product_id,
-                    BacktestingEngine._relative_to_absolute_epoch(
-                        product_id,
-                        BacktestingEngine.instance.current_relative_epochs[
-                            BacktestingEngine.instance.active_product]
-                    ))
+                    BacktestingEngine.instance.current_relative_epochs[
+                        BacktestingEngine.instance.active_product]
+                    )
             fill_fees = \
                 BacktestingEngine.instance.maker_fee * base_amount
             filled_size = \
@@ -245,12 +241,12 @@ class BacktestingEngine():
         open_rate = BacktestingEngine._get_rate(product, past_epoch)
         close_rate = BacktestingEngine._get_rate(product, current_epoch)
         max_rate = max([
-            entry[1] for entry in
+            entry[5] for entry in
             BacktestingEngine.instance.price_data[product][
                 past_epoch:current_epoch + 1]
             ])
         min_rate = min([
-            entry[1] for entry in
+            entry[5] for entry in
             BacktestingEngine.instance.price_data[product][
                 past_epoch:current_epoch + 1]]
             )
@@ -293,9 +289,9 @@ class BacktestingEngine():
 
         for i, entry in enumerate(BacktestingEngine.instance.price_data[
                 product][start_epoch_relative:end_epoch_relative + 1]):
-            open_rate = entry[1]
+            open_rate = entry[4]
             close_rate = \
-                BacktestingEngine.instance.price_data[product][i + 1][1]
+                BacktestingEngine.instance.price_data[product][i + 1][7]
             result.append([
                 BacktestingEngine._relative_to_absolute_epoch(product, i),
                 max(open_rate, close_rate),
@@ -344,13 +340,20 @@ class BacktestingEngine():
         with open(filepath, newline='') as f:
             reader = csv.reader(f, delimiter=";")
             prices = list(reader)[1:]
+            for elem in prices:
+                elem[0] = int(elem[0])
+                for i in range(4, len(elem)):
+                    elem[i] = float(elem[i])
+            prices.reverse()
 
         # Data has headers UNIX Timestamp, Excel Timestamp, Date, Symbol,
         # Open, High, Low, Close, Volume buy_currency, Volume base_currency
 
         BacktestingEngine.instance.price_data[product] = prices
 
-        BacktestingEngine.instance.current_relative_epochs[product] = 0
+        BacktestingEngine.instance.current_relative_epochs[product] = \
+            getIndexOfClosestEpoch(
+                prices, BacktestingEngine.instance.start_epoch)
 
     @staticmethod
     def advance_time() -> bool:
@@ -367,22 +370,28 @@ class BacktestingEngine():
 
         if (BacktestingEngine.instance.current_relative_epochs[product]
                 >= len(BacktestingEngine.instance.price_data[product])):
-            return True
+            raise ValueError('No historic data available for specified timepoint.')
+        if (
+            BacktestingEngine._relative_to_absolute_epoch(
+                product,
+                BacktestingEngine.instance.current_relative_epochs[product])
+                >= BacktestingEngine.instance.end_epoch):
+            raise Exception('End of backtesting period reached.')
         return False
 
     @staticmethod
-    def _get_rate(product: str, abs_epoch: int) -> float:
+    def _get_rate(product: str, rel_epoch: int) -> float:
         """Return the exchange rate at the current timepoint in simulation.
 
         Arguments:
-            produt {str} -- e.g. 'BTC-EUR'
+            product {str} -- e.g. 'BTC-EUR'
 
         Returns:
             float -- exchange rate: price in base currency
         """
         return BacktestingEngine.instance.price_data[product][
-            BacktestingEngine._absolute_to_relative_epoch(product, abs_epoch)
-        ][1]
+            rel_epoch
+        ][7]
 
     @staticmethod
     def _relative_to_absolute_epoch(product: str, rel_epoch: int) -> int:
