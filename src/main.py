@@ -29,10 +29,11 @@ public_client = BacktestingPublicClient()
 # Spawn N strategies
 # Wait until a strategy returns True, spawn a new one
 strategy = RelativeDropStrategy(product, public_client, auth_client, 0.1)
+# strategy.execute()
 strategy.backtest(
     '2020-02-20T14:00:00.000000',
-    '2020-02-25T14:00:00.000000',
-    60,
+    '2020-05-10T14:00:00.000000',
+    3600,
     {'EUR': 60.0},
     0.005,
     0.005
