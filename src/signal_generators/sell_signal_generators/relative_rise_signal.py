@@ -77,7 +77,7 @@ class RelativeRiseSignal(SellSignalGenerator):
     def _relativeRiseSignal(self) -> bool:
         price_rose = self.current_rate > (1.0 + self.rise_percentage) * self.buy_rate
 
-        print('------\n' + str(self.timestamp) + '\nCurrent rate: ' + str(self.current_rate) + '\nBought at rate: ' + str(self.buy_rate))
+        print('------\n' + str(self.timestamp['epoch']) + '\nCurrent rate: ' + str(self.current_rate) + '\nBought at rate: ' + str(self.buy_rate))
 
         if price_rose:
             print('Prices have risen back up')
