@@ -1,4 +1,5 @@
 import datetime
+import os
 
 from abc import ABC
 
@@ -100,7 +101,8 @@ class Strategy(ABC):
         return self.execute()
 
     def _createHistory(self):
-        dir_path = "./trading_bot/history/past_runs/"
+        current_path = os.getcwd()
+        dir_path = os.path.join(current_path, 'trading_bot/history/past_runs/')
         now = datetime.datetime.now()
         timestamp = now.strftime("%Y-%m-%d--%H:%M:%S")
         dir_path += (timestamp + "/")

@@ -1,4 +1,5 @@
 import csv
+import os
 
 from pycoingecko import CoinGeckoAPI
 from utilities.utils import \
@@ -331,8 +332,10 @@ class BacktestingEngine():
         elif BacktestingEngine.instance.granularity == 86400:
             path_granularity = '_1d'
 
-        filepath = (
-            "./trading_bot/resources/historic_data/"
+        current_path = os.getcwd()
+
+        filepath = current_path + (
+            "/trading_bot/resources/historic_data/"
             + product + '/'
             + product + path_granularity
             + '.csv')
