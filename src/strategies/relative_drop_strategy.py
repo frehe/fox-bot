@@ -26,7 +26,7 @@ class RelativeDropStrategy(Strategy):
         buy_signal_generator = \
             RelativeDropSignal(public_client, product, 18*60*60, p, 0.8)
         sell_signal_generator = \
-            RelativeRiseSignal(public_client, product, 0.08)
+            RelativeRiseSignal(public_client, product, 0.05)
         risk_allocator = \
             SimplePercentageRiskAllocator(auth_client, product, 0.1)
         super(RelativeDropStrategy, self).__init__(
