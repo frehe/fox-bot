@@ -335,7 +335,7 @@ class BacktestingEngine():
         current_path = os.getcwd()
 
         filepath = current_path + (
-            "/trading_bot/resources/historic_data/"
+            "/resources/historic_data/"
             + product + '/'
             + product + path_granularity
             + '.csv')
