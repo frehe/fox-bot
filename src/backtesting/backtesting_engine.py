@@ -1,3 +1,5 @@
+import csv
+
 from pycoingecko import CoinGeckoAPI
 from utilities.utils import \
     getIDOfCurrencyCoinGecko, UnixToISOTimestamp, ISOToUnixTimestamp, \
@@ -24,6 +26,8 @@ class BacktestingEngine():
             """
             self.time_grid = []
             # TODO: Write a data loader that provides a desired granularity
+            assert granularity in [3600, 86400], \
+                "Only hour-wise or day-wise granularity is supported so far."
             self.granularity = granularity
 
             self.cg = CoinGeckoAPI()
@@ -179,7 +183,13 @@ class BacktestingEngine():
 
             # Calculate how much is bought and remove fees
             base_amount = \
-                1.0 * funds * BacktestingEngine._get_current_rate(product_id)
+                1.0 * funds * BacktestingEngine._get_rate(
+                    product_id,
+                    BacktestingEngine._relative_to_absolute_epoch(
+                        product_id,
+                        BacktestingEngine.instance.current_relative_epochs[
+                            BacktestingEngine.instance.active_product]
+                    ))
             fill_fees = \
                 BacktestingEngine.instance.maker_fee * base_amount
             filled_size = \
@@ -300,24 +310,43 @@ class BacktestingEngine():
     @staticmethod
     def _loadPriceData(product: str):
         print('Loading price data for backtest on pair: ' + product)
-        buy_currency = product[:3]
-        base_currency = product[-3:]
-        coins_list = BacktestingEngine.instance.cg.get_coins_list()
-        buy_currency_id = \
-            getIDOfCurrencyCoinGecko(coins_list, buy_currency)
+        # buy_currency = product[:3]
+        # base_currency = product[-3:]
+        # coins_list = BacktestingEngine.instance.cg.get_coins_list()
+        # buy_currency_id = \
+        #     getIDOfCurrencyCoinGecko(coins_list, buy_currency)
 
         # TODO: Load with BaktestingEngine.instance.granularity
-        prices = \
-            BacktestingEngine.instance.cg \
-            .get_coin_market_chart_range_by_id(
-                id=buy_currency_id,
-                vs_currency=base_currency.lower(),
-                from_timestamp=BacktestingEngine.instance.start_epoch,
-                to_timestamp=BacktestingEngine.instance.end_epoch
-            )['prices']
+        # prices = \
+        #     BacktestingEngine.instance.cg \
+        #     .get_coin_market_chart_range_by_id(
+        #         id=buy_currency_id,
+        #         vs_currency=base_currency.lower(),
+        #         from_timestamp=BacktestingEngine.instance.start_epoch,
+        #         to_timestamp=BacktestingEngine.instance.end_epoch
+        #     )['prices']
 
-        for i, elem in enumerate(prices):
-            elem[0] = int(elem[0] / 1000.)
+        # for i, elem in enumerate(prices):
+        #     elem[0] = int(elem[0] / 1000.)
+
+        path_granularity = ''
+        if BacktestingEngine.instance.granularity == 3600:
+            path_granularity = '_1h'
+        elif BacktestingEngine.instance.granularity == 86400:
+            path_granularity = '_1d'
+
+        filepath = (
+            "./trading_bot/resources/historic_data/"
+            + product + '/'
+            + product + path_granularity
+            + '.csv')
+
+        with open(filepath, newline='') as f:
+            reader = csv.reader(f, delimiter=";")
+            prices = list(reader)[1:]
+
+        # Data has headers UNIX Timestamp, Excel Timestamp, Date, Symbol,
+        # Open, High, Low, Close, Volume buy_currency, Volume base_currency
 
         BacktestingEngine.instance.price_data[product] = prices
 
