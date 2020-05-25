@@ -34,11 +34,13 @@ def UnixToISOTimestamp(unix_time: float) -> str:
     """Convert the unix epoch time into a ISO8601-formatted date.
 
     Arguments:
-        unix_time {str} -- [description]
+        unix_time {int} -- [description]
 
     Returns:
         str -- [description]
     """
+    if isinstance(unix_time, str):
+        unix_time = int(unix_time)
     return datetime.fromtimestamp(unix_time, tz=timezone.utc)\
         .strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3] + 'Z'
 
