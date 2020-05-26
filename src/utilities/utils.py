@@ -12,11 +12,6 @@ def getIndexOfOrder(order_list: list, order: str) -> int:
     return _getIndex(order_list, order, 'id')
 
 
-def getIDOfCurrencyCoinGecko(coins_list: list, currency: str) -> str:
-    idx = _getIndex(coins_list, currency.lower(), 'symbol')
-    return coins_list[idx]['id']
-
-
 def getIndexOfClosestEpoch(price_data: list, abs_epoch: int) -> int:
     closest_index = 0
     for i, entry in enumerate(price_data):

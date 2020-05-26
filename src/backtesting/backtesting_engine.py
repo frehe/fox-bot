@@ -1,8 +1,7 @@
 import csv
 
-from pycoingecko import CoinGeckoAPI
 from utilities.utils import \
-    getIDOfCurrencyCoinGecko, UnixToISOTimestamp, ISOToUnixTimestamp, \
+    UnixToISOTimestamp, ISOToUnixTimestamp, \
     getIndexOfCurrency, getIndexOfOrder, getIndexOfClosestEpoch, \
     getWorkingDirectory, joinPaths
 from utilities.enums import Currencies, CurrenciesDetail
@@ -30,8 +29,6 @@ class BacktestingEngine():
             assert granularity in [3600, 86400], \
                 "Only hour-wise or day-wise granularity is supported so far."
             self.granularity = granularity
-
-            self.cg = CoinGeckoAPI()
 
             # Convert start and end dates to epoch
             self.start_epoch = int(ISOToUnixTimestamp(start_time))
@@ -307,25 +304,6 @@ class BacktestingEngine():
     @staticmethod
     def _loadPriceData(product: str):
         print('Loading price data for backtest on pair: ' + product)
-        # buy_currency = product[:3]
-        # base_currency = product[-3:]
-        # coins_list = BacktestingEngine.instance.cg.get_coins_list()
-        # buy_currency_id = \
-        #     getIDOfCurrencyCoinGecko(coins_list, buy_currency)
-
-        # TODO: Load with BaktestingEngine.instance.granularity
-        # prices = \
-        #     BacktestingEngine.instance.cg \
-        #     .get_coin_market_chart_range_by_id(
-        #         id=buy_currency_id,
-        #         vs_currency=base_currency.lower(),
-        #         from_timestamp=BacktestingEngine.instance.start_epoch,
-        #         to_timestamp=BacktestingEngine.instance.end_epoch
-        #     )['prices']
-
-        # for i, elem in enumerate(prices):
-        #     elem[0] = int(elem[0] / 1000.)
-
         path_granularity = ''
         if BacktestingEngine.instance.granularity == 3600:
             path_granularity = '_1h'
@@ -336,11 +314,6 @@ class BacktestingEngine():
         filepath = joinPaths([
             current_path, "resources", "historic_data",
             product, product + path_granularity + '.csv'])
-        # filepath = current_path + (
-        #     "/resources/historic_data/"
-        #     + product + '/'
-        #     + product + path_granularity
-        #     + '.csv')
 
         with open(filepath, newline='') as f:
             reader = csv.reader(f, delimiter=";")

@@ -9,6 +9,3 @@ A modular bot to create trading strategies, backtest and run on any exchange. It
 *This software is provided as-is. Use it at your own risk.*
 
 Starting with simple strategies and simulation only.
-
-
-Powered by CoinGecko API.
