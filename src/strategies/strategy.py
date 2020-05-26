@@ -1,5 +1,4 @@
 import datetime
-import os
 
 from abc import ABC
 
@@ -14,6 +13,7 @@ from backtesting.backtesting_engine import BacktestingEngine
 
 from utilities.product_infos import ProductInfos
 from utilities.data_handler import DataHandler
+from utilities.utils import getWorkingDirectory, joinPaths
 
 
 class Strategy(ABC):
@@ -101,8 +101,9 @@ class Strategy(ABC):
         return self.execute()
 
     def _createHistory(self):
-        current_path = os.getcwd()
+        current_path = getWorkingDirectory()
         now = datetime.datetime.now()
         timestamp = now.strftime("%Y-%m-%d--%H:%M:%S")
-        dir_path = os.path.join(current_path, 'history', 'past_runs', timestamp)
+        dir_path = joinPaths([
+            current_path, 'history', 'past_runs', timestamp])
         self.data_handler = DataHandler(dir_path)

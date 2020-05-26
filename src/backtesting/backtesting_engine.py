@@ -1,10 +1,10 @@
 import csv
-import os
 
 from pycoingecko import CoinGeckoAPI
 from utilities.utils import \
     getIDOfCurrencyCoinGecko, UnixToISOTimestamp, ISOToUnixTimestamp, \
-    getIndexOfCurrency, getIndexOfOrder, getIndexOfClosestEpoch
+    getIndexOfCurrency, getIndexOfOrder, getIndexOfClosestEpoch, \
+    getWorkingDirectory, joinPaths
 from utilities.enums import Currencies, CurrenciesDetail
 
 
@@ -332,13 +332,15 @@ class BacktestingEngine():
         elif BacktestingEngine.instance.granularity == 86400:
             path_granularity = '_1d'
 
-        current_path = os.getcwd()
-
-        filepath = current_path + (
-            "/resources/historic_data/"
-            + product + '/'
-            + product + path_granularity
-            + '.csv')
+        current_path = getWorkingDirectory()
+        filepath = joinPaths([
+            current_path, "resources", "historic_data",
+            product, product + path_granularity + '.csv'])
+        # filepath = current_path + (
+        #     "/resources/historic_data/"
+        #     + product + '/'
+        #     + product + path_granularity
+        #     + '.csv')
 
         with open(filepath, newline='') as f:
             reader = csv.reader(f, delimiter=";")

@@ -1,4 +1,5 @@
 import calendar
+import os
 
 from datetime import datetime, timezone
 
@@ -58,3 +59,38 @@ def ISOToUnixTimestamp(iso_time: str) -> str:
         iso_time = iso_time[:-1] + '000'
 
     return str(calendar.timegm(datetime.strptime(iso_time, '%Y-%m-%dT%H:%M:%S.%f').timetuple()))
+
+
+def getWorkingDirectory() -> str:
+    """Obtain the root directory.
+
+    Returns:
+        str -- [description]
+    """
+    current_path = os.getcwd()
+    head, tail = os.path.split(current_path)
+    print('Current path:' + current_path)
+    print('Head:' + head)
+    print("Tail:" + tail)
+    if tail == "src":
+        current_path = head
+    print('Current path:' + current_path)
+
+    return current_path
+
+
+def joinPaths(paths: list) -> str:
+    """Joins all paths in a list
+
+    Arguments:
+        paths {list} -- [description]
+
+    Returns:
+        str -- [description]
+    """
+    joined_path = paths[0]
+    if len(paths) == 1:
+        return joined_path
+    for path in paths[1:]:
+        joined_path = os.path.join(joined_path, path)
+    return joined_path
