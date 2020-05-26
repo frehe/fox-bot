@@ -69,9 +69,6 @@ def getWorkingDirectory() -> str:
     """
     current_path = os.getcwd()
     head, tail = os.path.split(current_path)
-    print('Current path:' + current_path)
-    print('Head:' + head)
-    print("Tail:" + tail)
     if tail == "src":
         current_path = head
     print('Current path:' + current_path)
