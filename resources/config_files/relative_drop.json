@@ -1,0 +1,13 @@
+{
+    "product": "BTC-EUR",
+    "exchange": "Coinbase Pro",
+    "strategy": "Relative Drop",
+    "backtest": {
+        "start": "2019-02-20T14:00:00.000000",
+        "end": "2020-05-10T14:00:00.000000",
+        "granularity": 3600,
+        "start_balances": {"EUR": 60.0},
+        "maker_fee": 0.005,
+        "taker_fee": 0.005
+    }
+}
