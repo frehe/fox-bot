@@ -1,10 +1,10 @@
-import cbpro
+from clients.auth_clients.my_authenticated_client import MyAuthenticatedClient
 
 from trades.trade import Trade
 
 
 class SellTrade(Trade):
-    def __init__(self, auth_client: cbpro.AuthenticatedClient, order_type: str, order_side: str, product: str, sell_size: float):
+    def __init__(self, auth_client: MyAuthenticatedClient, order_type: str, order_side: str, product: str, sell_size: float):
         super(SellTrade, self).__init__(auth_client, order_type, order_side, product)
         self.sell_size = sell_size
 

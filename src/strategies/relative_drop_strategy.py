@@ -1,4 +1,5 @@
-import cbpro
+from clients.auth_clients.my_authenticated_client import MyAuthenticatedClient
+from clients.public_clients.my_public_client import MyPublicClient
 
 from strategies.strategy import Strategy
 
@@ -12,18 +13,19 @@ from risk_allocators.simple_percentage_risk_allocator \
 
 class RelativeDropStrategy(Strategy):
     def __init__(
-            self, product: str, public_client: cbpro.PublicClient,
-            auth_client: cbpro.AuthenticatedClient, config: dict):
+            self, product: str, public_client: MyPublicClient,
+            auth_client: MyAuthenticatedClient, config: dict):
         """Initialize the relative drop strategy
 
         Arguments:
             Strategy {[type]} -- [description]
             product {str} -- [description]
-            public_client {cbpro.PublicClient} -- [description]
-            auth_client {cbpro.AuthenticatedClient} -- [description]
+            public_client {MyPublicClient} -- [description]
+            auth_client {MyAuthenticatedClient} -- [description]
             config {dict} -- [description]
         """
         p = config['strategy_params']['p']
+
         buy_signal_generator = \
             RelativeDropSignal(public_client, product, 18*60*60, p, 0.8)
         sell_signal_generator = \

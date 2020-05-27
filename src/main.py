@@ -19,8 +19,10 @@ from utilities.secrets import Secrets
 
 def main(args):
     # Read config file
-    config_file = joinPaths([getWorkingDirectory(), 'resources', 'config_files', args.input])
-    with open(config_file) as cf:
+    config_file = joinPaths([
+        getWorkingDirectory(), 'resources', 'config_files', args.input
+    ])
+    with open(config_file, 'r') as cf:
         data = json.load(cf)
 
     product = data['product']

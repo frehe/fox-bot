@@ -1,13 +1,16 @@
-import cbpro
 import math
 import string
 import time
 
 from abc import ABC, abstractmethod
+
+from clients.auth_clients.my_authenticated_client import MyAuthenticatedClient
+
 from utilities.product_infos import ProductInfos
 
+
 class Trade(ABC):
-    def __init__(self, auth_client: cbpro.AuthenticatedClient, order_type: str, order_side: str, product: str):
+    def __init__(self, auth_client: MyAuthenticatedClient, order_type: str, order_side: str, product: str):
         super().__init__()
         self.auth_client = auth_client
         self.order_type = order_type  # "limit" (="maker") or "market" (="taker")

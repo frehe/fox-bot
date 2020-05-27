@@ -1,4 +1,4 @@
-import cbpro
+from clients.auth_clients.my_authenticated_client import MyAuthenticatedClient
 
 from signals.buy_signal import BuySignal
 from signals.sell_signal import SellSignal
@@ -12,7 +12,7 @@ from utilities.utils import getIndexOfCurrency
 
 
 class SimplePercentageRiskAllocator(RiskAllocator):
-    def __init__(self, auth_client: cbpro.AuthenticatedClient, product: str, p):
+    def __init__(self, auth_client: MyAuthenticatedClient, product: str, p):
         super(SimplePercentageRiskAllocator, self).__init__(auth_client, product)
         self.p = p
 

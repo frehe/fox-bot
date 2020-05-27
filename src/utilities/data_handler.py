@@ -57,7 +57,7 @@ class DataHandler():
                     fieldnames=self.trade_history_columns,
                     restval='n/a',
                     extrasaction='ignore')
-                
+
                 timestamp = ISOToUnixTimestamp(data['done_at'])
                 data['timestamp'] = timestamp
                 self.trade_writer.writerow(data)
