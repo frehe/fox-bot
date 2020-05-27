@@ -30,7 +30,7 @@ def main(args):
         auth_client = BacktestingAuthenticatedClient()
         public_client = BacktestingPublicClient()
     else:
-        exchange = config['Exchange']
+        exchange = config['exchange']
         if exchange == "Coinbase Pro":
             auth_client = CBProAuthenticatedClient(
                 key=Secrets.sandbox_key,
