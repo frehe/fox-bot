@@ -74,7 +74,7 @@ if __name__ == '__main__':
         '-b', '--backtest', dest='backtest', action='store_true',
         help='if flag is set, backtest the strategy instead of running it')
     parser.add_argument(
-        '-v', dest='verbose', action='store_true',
+        '-v', '--verbose', dest='verbose', action='store_true',
         help='enter verbose mode')
     args = parser.parse_args()
     # ... do something with args.output ...
