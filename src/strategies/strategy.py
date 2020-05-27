@@ -20,7 +20,7 @@ class Strategy(ABC):
     def __init__(
         self, buy_signal_generator, sell_signal_generator,
             risk_allocator, product: str, public_client,
-            auth_client):
+            auth_client, config: dict):
 
         self.buy_signal_generator = buy_signal_generator
         self.sell_signal_generator = sell_signal_generator
@@ -28,6 +28,7 @@ class Strategy(ABC):
         self.product = product
         self.public_client = public_client
         self.auth_client = auth_client
+        self.config = config
         self.strategy_active = True
 
         self.data_handler = None
@@ -35,6 +36,7 @@ class Strategy(ABC):
     def execute(self) -> bool:
         # create history folder to save all output to
         self._createHistory()
+        self.data_handler.write_config(self.config)
 
         # Refresh information on the traded products
         ProductInfos.refresh(self.public_client, self.product)

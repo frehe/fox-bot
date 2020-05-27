@@ -44,7 +44,7 @@ def main(args):
     # Wait until a strategy returns True, spawn a new one
     strategy_name = data['strategy']
     if strategy_name == "Relative Drop":
-        strategy = RelativeDropStrategy(product, public_client, auth_client, 0.05)
+        strategy = RelativeDropStrategy(product, public_client, auth_client, data)
     else:
         raise ValueError("Strategy name unknown")
 

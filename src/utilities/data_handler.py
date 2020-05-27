@@ -1,5 +1,6 @@
 import os
 import csv
+import json
 
 from trades.trade import Trade
 from clients.auth_clients.my_authenticated_client import MyAuthenticatedClient
@@ -38,6 +39,8 @@ class DataHandler():
                 restval='n/a',
                 extrasaction='ignore')
             self.balance_writer.writeheader()
+
+        self.config_filename = self.dir_path + "/config.json"
 
     def write_trade_history(self, data: list):
         """[summary]
@@ -85,5 +88,12 @@ class DataHandler():
                 for idx in currency_indices:
                     accounts[idx]['timestamp'] = timestamp
                     self.balance_writer.writerow(accounts[idx])
+        except IOError:
+            print("I/O error on writing balance history")
+
+    def write_config(self, config: dict):
+        try:
+            with open(self.config_filename, 'w') as outfile:
+                json.dump(config, outfile, indent=4)
         except IOError:
             print("I/O error on writing balance history")
