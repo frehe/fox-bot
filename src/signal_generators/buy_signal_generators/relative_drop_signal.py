@@ -90,7 +90,7 @@ class RelativeDropSignal(BuySignalGenerator):
 
     def _getRate(self, start, end):
         # get price
-        print('getting rates')
+        print('Getting rates...')
         rates = self.public_client.get_product_historic_rates(
             product=self.product,
             start=start,
