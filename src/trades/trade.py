@@ -1,8 +1,7 @@
 import math
-import string
 import time
 
-from abc import ABC, abstractmethod
+from abc import ABC
 
 from clients.auth_clients.my_authenticated_client import MyAuthenticatedClient
 
@@ -10,10 +9,12 @@ from utilities.product_infos import ProductInfos
 
 
 class Trade(ABC):
-    def __init__(self, auth_client: MyAuthenticatedClient, order_type: str, order_side: str, product: str):
+    def __init__(
+            self, auth_client: MyAuthenticatedClient,
+            order_type: str, order_side: str, product: str):
         super().__init__()
         self.auth_client = auth_client
-        self.order_type = order_type  # "limit" (="maker") or "market" (="taker")
+        self.order_type = order_type  # "limit" ("maker") or "market" ("taker")
         self.order_side = order_side  # "buy" or "sell"
         self.product = product  # e.g. "BTC-EUR"
         self.trade_info = None
@@ -28,7 +29,8 @@ class Trade(ABC):
             while self.trade_info['settled'] is not True:
                 print('Waiting for trade to settle')
                 time.sleep(1)
-                self.trade_info = self.auth_client.get_order(self.trade_info['id'])
+                self.trade_info = \
+                    self.auth_client.get_order(self.trade_info['id'])
         else:
             print(self.trade_info)
             if self.trade_info['message'] == 'ServiceUnavailable':

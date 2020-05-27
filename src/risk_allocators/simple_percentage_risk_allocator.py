@@ -13,7 +13,8 @@ from utilities.utils import getIndexOfCurrency
 
 class SimplePercentageRiskAllocator(RiskAllocator):
     def __init__(self, auth_client: MyAuthenticatedClient, product: str, p):
-        super(SimplePercentageRiskAllocator, self).__init__(auth_client, product)
+        super(SimplePercentageRiskAllocator, self).__init__(
+            auth_client, product)
         self.p = p
 
     def createBuyTrade(self, buy_signal: BuySignal) -> BuyTrade:
@@ -24,10 +25,11 @@ class SimplePercentageRiskAllocator(RiskAllocator):
         use_funds = self.available_to_sell
 
         if self.activated:
-            trade = BuyTrade(self.auth_client, 'market', 'buy', self.product, use_funds)
+            trade = BuyTrade(
+                self.auth_client, 'market', 'buy', self.product, use_funds)
         else:
             raise ValueError("Buy signal is not activated")
-            
+
         return trade
 
     def createSellTrade(self, sell_signal: SellSignal) -> SellTrade:
@@ -37,7 +39,8 @@ class SimplePercentageRiskAllocator(RiskAllocator):
         sell_funds = self.available_to_sell
 
         if self.activated:
-            trade = SellTrade(self.auth_client, 'market', 'sell', self.product, sell_funds)
+            trade = SellTrade(
+                self.auth_client, 'market', 'sell', self.product, sell_funds)
         else:
             raise ValueError("Sell signal is not activated")
 

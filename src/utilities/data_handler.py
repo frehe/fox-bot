@@ -2,7 +2,6 @@ import os
 import csv
 import json
 
-from trades.trade import Trade
 from clients.auth_clients.my_authenticated_client import MyAuthenticatedClient
 
 from utilities.utils import getIndexOfCurrency, ISOToUnixTimestamp
@@ -48,8 +47,6 @@ class DataHandler():
         Arguments:
             data {list} -- [description]
         """
-        # Filter all dict fields that have one of the desired keys
-        # data = {k: data[k] if k in data else 'n/a' for k in self.trade_history_columns}
         try:
             with open(self.trade_history_filename, 'a') as csvfile:
                 self.trade_writer = csv.DictWriter(
@@ -71,7 +68,7 @@ class DataHandler():
         Arguments:
             auth_client {MyAuthenticatedClient} -- [description]
         """
-        timestamp = ISOToUnixTimestamp(auth_client.get_time()['iso'])  # Unix epoch
+        timestamp = ISOToUnixTimestamp(auth_client.get_time()['iso'])
         accounts = auth_client.get_accounts()
 
         currency_indices = [

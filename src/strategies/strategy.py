@@ -2,13 +2,6 @@ import datetime
 
 from abc import ABC
 
-# from clients.auth_clients.my_authenticated_client import MyAuthenticatedClient
-# from clients.public_clients.my_public_client import MyPublicClient
-from clients.auth_clients.backtesting_authenticated_client \
-    import BacktestingAuthenticatedClient
-from clients.public_clients.backtesting_public_client \
-    import BacktestingPublicClient
-
 from backtesting.backtesting_engine import BacktestingEngine
 
 from utilities.product_infos import ProductInfos
@@ -98,8 +91,6 @@ class Strategy(ABC):
 
         self.Backtest.activateProduct(self.product)
 
-        self.auth_client = BacktestingAuthenticatedClient()
-        self.public_client = BacktestingPublicClient()
         return self.execute()
 
     def _createHistory(self):

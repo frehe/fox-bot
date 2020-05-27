@@ -4,7 +4,6 @@ from clients.auth_clients.my_authenticated_client import MyAuthenticatedClient
 
 from signals.buy_signal import BuySignal
 from signals.sell_signal import SellSignal
-from signals.signal import Signal
 
 from trades.buy_trade import BuyTrade
 from trades.sell_trade import SellTrade

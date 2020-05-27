@@ -46,7 +46,8 @@ def main(args):
     # Wait until a strategy returns True, spawn a new one
     strategy_name = data['strategy']
     if strategy_name == "Relative Drop":
-        strategy = RelativeDropStrategy(product, public_client, auth_client, data)
+        strategy = RelativeDropStrategy(
+            product, public_client, auth_client, data)
     else:
         raise ValueError("Strategy name unknown")
 
@@ -70,8 +71,10 @@ def main(args):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Execte a trading strategy with Fox Bot')
-    parser.add_argument('-i', '--input', help='a .json input configuration file')
+    parser = argparse.ArgumentParser(
+        description='Execte a trading strategy with Fox Bot')
+    parser.add_argument(
+        '-i', '--input', help='a .json input configuration file')
     parser.add_argument(
         '-b', '--backtest', dest='backtest', action='store_true',
         help='if flag is set, backtest the strategy instead of running it')

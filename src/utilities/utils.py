@@ -15,7 +15,8 @@ def getIndexOfOrder(order_list: list, order: str) -> int:
 def getIndexOfClosestEpoch(price_data: list, abs_epoch: int) -> int:
     closest_index = 0
     for i, entry in enumerate(price_data):
-        if abs(entry[0] - abs_epoch) < abs(price_data[closest_index][0] - abs_epoch):
+        if abs(entry[0] - abs_epoch) \
+                < abs(price_data[closest_index][0] - abs_epoch):
             closest_index = i
     return closest_index
 
@@ -53,7 +54,8 @@ def ISOToUnixTimestamp(iso_time: str) -> str:
     if iso_time[-1] == 'Z':
         iso_time = iso_time[:-1] + '000'
 
-    return str(calendar.timegm(datetime.strptime(iso_time, '%Y-%m-%dT%H:%M:%S.%f').timetuple()))
+    return str(calendar.timegm(
+        datetime.strptime(iso_time, '%Y-%m-%dT%H:%M:%S.%f').timetuple()))
 
 
 def getWorkingDirectory() -> str:
