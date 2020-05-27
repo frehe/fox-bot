@@ -7,15 +7,19 @@ from signal_generators.signal_generator import SignalGenerator
 
 
 class SellSignalGenerator(SignalGenerator):
-    def __init__(self, public_client: MyPublicClient, product: str):
+    def __init__(
+            self, public_client: MyPublicClient, product: str, granularity):
         """Init a signal generator with given parameters.
 
-        A signal generator analyzes past price data. It returns triggers to buy or sell when an event occurs.
+        A signal generator analyzes past price data. It returns triggers to
+        buy or sell when an event occurs.
 
         Arguments:
-            timespan {int} -- analyze price changes over this number of seconds past.
+            timespan {int} -- analyze price changes over this number of
+            seconds past.
         """
-        super(SellSignalGenerator, self).__init__(public_client, product)
+        super(SellSignalGenerator, self).__init__(
+            public_client, product, granularity)
 
     def getSignal(self, buy_signal: BuySignal) -> SellSignal:
         pass

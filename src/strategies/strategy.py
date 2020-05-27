@@ -22,7 +22,6 @@ class Strategy(ABC):
         self.public_client = public_client
         self.auth_client = auth_client
         self.config = config
-        self.strategy_active = True
 
         self.data_handler = None
 
@@ -34,7 +33,7 @@ class Strategy(ABC):
         # Refresh information on the traded products
         ProductInfos.refresh(self.public_client, self.product)
 
-        while self.strategy_active is True:
+        for _ in range(self.config['strategy_params']['episodes']):
             # Launch buy signal generator and wait for signal
             buy_signal = self.buy_signal_generator.getSignal()
 
@@ -62,9 +61,7 @@ class Strategy(ABC):
 
         return True
 
-    def backtest(
-            self, start_time: str, end_time: str, granularity: int,
-            balances: dict, maker_fee: float, taker_fee: float) -> bool:
+    def backtest(self) -> bool:
         """Run a backtest on strategy.
 
         Arguments:
@@ -81,12 +78,12 @@ class Strategy(ABC):
         """
         # Init backtesting engine
         self.Backtest = BacktestingEngine(
-            start_time=start_time,
-            end_time=end_time,
-            granularity=granularity,
-            balances=balances,
-            maker_fee=maker_fee,
-            taker_fee=taker_fee
+            start_time=self.config['backtest']['start'],
+            end_time=self.config['backtest']['end'],
+            granularity=self.config['backtest']['granularity'],
+            balances=self.config['backtest']['start_balances'],
+            maker_fee=self.config['backtest']['maker_fee'],
+            taker_fee=self.config['backtest']['taker_fee']
         )
 
         self.Backtest.activateProduct(self.product)

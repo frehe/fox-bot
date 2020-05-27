@@ -25,9 +25,9 @@ class BacktestingEngine():
                                         e.g. {'BTC': '100.000', ...}
             """
             self.time_grid = []
-            # TODO: Write a data loader that provides a desired granularity
             assert granularity in [3600, 86400], \
-                "Only hour-wise or day-wise granularity is supported so far."
+                ("Only hour-wise or day-wise granularity is supported "
+                    + "for backtesting so far.")
             self.granularity = granularity
 
             # Convert start and end dates to epoch
@@ -79,9 +79,6 @@ class BacktestingEngine():
         else:
             raise ValueError("Backtesting Singleton instance already exists.")
 
-    # def __getattribute__(self, n):
-    #     return getattr(self.instance, n)
-
     @staticmethod
     def clearPriceData(product: str):
         BacktestingEngine.instance.price_data.pop(product, None)
@@ -113,7 +110,8 @@ class BacktestingEngine():
         Arguments:
             product_id {str} -- e.g. 'BTC-EUR'
             side {str} -- 'buy' or 'sell'
-            funds {str} -- 'buy': amount in EUR to use, 'sell': amount in BTC to sell.
+            funds {str} -- 'buy': amount in EUR to use,
+                            'sell': amount in BTC to sell.
 
         Returns:
             dict -- [description]
@@ -280,8 +278,10 @@ class BacktestingEngine():
         start_epoch = int(ISOToUnixTimestamp(start))
         end_epoch = int(ISOToUnixTimestamp(end))
 
-        start_epoch_relative = BacktestingEngine._absolute_to_relative_epoch(product, start_epoch)
-        end_epoch_relative = BacktestingEngine._absolute_to_relative_epoch(product, end_epoch)
+        start_epoch_relative = BacktestingEngine._absolute_to_relative_epoch(
+            product, start_epoch)
+        end_epoch_relative = BacktestingEngine._absolute_to_relative_epoch(
+            product, end_epoch)
 
         result = []
 
@@ -298,7 +298,7 @@ class BacktestingEngine():
                 close_rate,
                 None
             ])
-        
+
         return result
 
     @staticmethod
@@ -348,7 +348,8 @@ class BacktestingEngine():
 
         if (BacktestingEngine.instance.current_relative_epochs[product]
                 >= len(BacktestingEngine.instance.price_data[product])):
-            raise ValueError('No historic data available for specified timepoint.')
+            raise ValueError(
+                'No historic data available for specified timepoint.')
         if (
             BacktestingEngine._relative_to_absolute_epoch(
                 product,

@@ -13,6 +13,8 @@
         "taker_fee": 0.005
     },
     "strategy_params": {
+        "granularity": 3600,
+        "episodes": 100,
         "p": 0.05
     }
 }

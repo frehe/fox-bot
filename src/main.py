@@ -1,4 +1,3 @@
-import time
 import json
 import argparse
 
@@ -23,15 +22,15 @@ def main(args):
         getWorkingDirectory(), 'resources', 'config_files', args.input
     ])
     with open(config_file, 'r') as cf:
-        data = json.load(cf)
+        config = json.load(cf)
 
-    product = data['product']
+    product = config['product']
 
     if args.backtest:
         auth_client = BacktestingAuthenticatedClient()
         public_client = BacktestingPublicClient()
     else:
-        exchange = data['Exchange']
+        exchange = config['Exchange']
         if exchange == "Coinbase Pro":
             auth_client = CBProAuthenticatedClient(
                 key=Secrets.sandbox_key,
@@ -44,29 +43,20 @@ def main(args):
 
     # Spawn N strategies
     # Wait until a strategy returns True, spawn a new one
-    strategy_name = data['strategy']
+    strategy_name = config['strategy']
     if strategy_name == "Relative Drop":
         strategy = RelativeDropStrategy(
-            product, public_client, auth_client, data)
+            product, public_client, auth_client, config)
     else:
         raise ValueError("Strategy name unknown")
 
     if args.backtest:
         print("Backtesting strategy...")
-        strategy.backtest(
-            data['backtest']['start'],
-            data['backtest']['end'],
-            data['backtest']['granularity'],
-            data['backtest']['start_balances'],
-            data['backtest']['maker_fee'],
-            data['backtest']['taker_fee']
-        )
+        strategy.backtest()
     else:
         print("Executing strategy...")
         strategy.execute()
 
-    time.sleep(300)
-    strategy.strategy_active = False  # Gracefully end strategy
     print('Strategy done')
 
 

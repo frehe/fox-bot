@@ -1,18 +1,15 @@
-import time
-from datetime import datetime, timezone
-
 from signals.buy_signal import BuySignal
 from signals.sell_signal import SellSignal
 
-from signal_generators.sell_signal_generators.sell_signal_generator import SellSignalGenerator
+from signal_generators.sell_signal_generators.sell_signal_generator \
+    import SellSignalGenerator
 
-from utilities.utils import UnixToISOTimestamp
 from utilities.secrets import Secrets
 from clients.websocket_clients.my_websocket_client import MyWebsocketClient
 
 
 class RelativeRiseSignal(SellSignalGenerator):
-    def __init__(self, public_client, product, rise_percentage):
+    def __init__(self, public_client, product, granularity, rise_percentage):
         """[summary]
 
         Arguments:
@@ -21,12 +18,14 @@ class RelativeRiseSignal(SellSignalGenerator):
             product {[type]} -- [description]
             timespan {[type]} -- [description]
             drop_percentage {[type]} -- [description]
-            max_price_percentage {[type]} -- Buy only if current price is at most low + percentage * (high - low)
-        """        
-        super(RelativeRiseSignal, self).__init__(public_client, product)
+            max_price_percentage {[type]} -- Buy only if current price is at
+                                        most low + percentage * (high - low)
+        """
+        super(RelativeRiseSignal, self).__init__(
+            public_client, product, granularity)
 
         self.rise_percentage = rise_percentage
-        self.granularity = 3600
+        self.granularity = granularity
 
         self.wsClient = MyWebsocketClient(
             products=product,
@@ -38,13 +37,13 @@ class RelativeRiseSignal(SellSignalGenerator):
 
     def getSignal(self, buy_signal: BuySignal) -> SellSignal:
         self._printStatus()
-        self.buy_rate = buy_signal.signal['current_rate']  # TODO: replace by info from trade log
+        # TODO: replace below by info from trade log
+        self.buy_rate = buy_signal.signal['current_rate']
         signal = False
 
         # TODO: replace with standard price queries as with buy-signals
         while not signal:
             self.timestamp = self.public_client.get_time()
-            current_epoch = self.timestamp['epoch']
 
             day_stats = self.public_client.get_product_24hr_stats(self.product)
 
@@ -56,17 +55,6 @@ class RelativeRiseSignal(SellSignalGenerator):
 
             self.public_client.advance_time(self.granularity)
 
-        # self.wsClient.start()
-        # while not self.signal:
-        #     # Get current price from websocket
-        #     self.current_rate = self.wsClient.latest_msg
-        #     if self.current_rate is not None:
-        #         self.signal = self._relativeRiseSignal()
-
-        #     # time.sleep(self.granularity)
-        #     self.public_client.advance_time(self.granularity)
-
-        # self.wsClient.close()
         sell_signal = SellSignal()
         sell_signal.signal['activated'] = True
         sell_signal.signal['buy_rate'] = self.buy_rate
@@ -75,9 +63,16 @@ class RelativeRiseSignal(SellSignalGenerator):
         return sell_signal
 
     def _relativeRiseSignal(self) -> bool:
-        price_rose = self.current_rate > (1.0 + self.rise_percentage) * self.buy_rate
+        price_rose = \
+            self.current_rate > (1.0 + self.rise_percentage) * self.buy_rate
 
-        print('------\n' + str(self.timestamp['epoch']) + '\nCurrent rate: ' + str(self.current_rate) + '\nBought at rate: ' + str(self.buy_rate))
+        print(
+            '------\n'
+            + self.timestamp['iso']
+            + '\nBought at rate: '
+            + str(self.buy_rate)
+            + '\nCurrent rate: '
+            + str(self.current_rate))
 
         if price_rose:
             print('Prices have risen back up')
