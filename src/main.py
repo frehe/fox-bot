@@ -69,9 +69,13 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Execte a trading strategy with Fox Bot')
-    parser.add_argument('-i', '--input')
-    parser.add_argument('-b', '--backtest', dest='backtest', action='store_true')
-    parser.add_argument('-v', dest='verbose', action='store_true')
+    parser.add_argument('-i', '--input', help='a .json input configuration file')
+    parser.add_argument(
+        '-b', '--backtest', dest='backtest', action='store_true',
+        help='if flag is set, backtest the strategy instead of running it')
+    parser.add_argument(
+        '-v', dest='verbose', action='store_true',
+        help='enter verbose mode')
     args = parser.parse_args()
     # ... do something with args.output ...
     # ... do something with args.verbose ..
