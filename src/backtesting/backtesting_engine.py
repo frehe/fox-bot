@@ -137,7 +137,7 @@ class BacktestingEngine():
 
             # Calculate how much is bought and remove fees
             buy_amount = \
-                (1.0 * funds) / BacktestingEngine._get_rate(
+                (1.0 * funds) / BacktestingEngine._get_open_rate(
                     product_id,
                     BacktestingEngine.instance.current_relative_epochs[
                         BacktestingEngine.instance.active_product]
@@ -177,7 +177,7 @@ class BacktestingEngine():
 
             # Calculate how much is bought and remove fees
             base_amount = \
-                1.0 * funds * BacktestingEngine._get_rate(
+                1.0 * funds * BacktestingEngine._get_open_rate(
                     product_id,
                     BacktestingEngine.instance.current_relative_epochs[
                         BacktestingEngine.instance.active_product]
@@ -234,25 +234,30 @@ class BacktestingEngine():
                 product,
                 BacktestingEngine._relative_to_absolute_epoch(
                     product, current_epoch) - 24 * 60 * 60)  # go back 24 hrs
-        open_rate = BacktestingEngine._get_rate(product, past_epoch)
-        close_rate = BacktestingEngine._get_rate(product, current_epoch)
+        open_rate = BacktestingEngine._get_open_rate(product, past_epoch)
+        close_rate = BacktestingEngine._get_open_rate(product, current_epoch)
         max_rate = max([
             entry[5] for entry in
             BacktestingEngine.instance.price_data[product][
                 past_epoch:current_epoch + 1]
             ])
         min_rate = min([
-            entry[5] for entry in
+            entry[6] for entry in
             BacktestingEngine.instance.price_data[product][
                 past_epoch:current_epoch + 1]]
             )
+        volume = sum([
+            entry[8] for entry in
+            BacktestingEngine.instance.price_data[product][
+                past_epoch:current_epoch + 1]
+        ])
 
         return {
             'open': str(open_rate),
             'last': str(close_rate),
             'high': str(max_rate),
             'low': str(min_rate),
-            'volume': "NaN"
+            'volume': str(volume)
         }
 
     @staticmethod
@@ -286,17 +291,20 @@ class BacktestingEngine():
         result = []
 
         for i, entry in enumerate(BacktestingEngine.instance.price_data[
-                product][start_epoch_relative:end_epoch_relative + 1]):
+                product][start_epoch_relative:end_epoch_relative]):
+            start_time = entry[0]
             open_rate = entry[4]
-            close_rate = \
-                BacktestingEngine.instance.price_data[product][i + 1][7]
+            close_rate = entry[7]
+            max_rate = entry[5]
+            min_rate = entry[6]
+            volume = entry[8]
             result.append([
-                BacktestingEngine._relative_to_absolute_epoch(product, i),
-                max(open_rate, close_rate),
-                min(open_rate, close_rate),
+                start_time,
+                min_rate,
+                max_rate,
                 open_rate,
                 close_rate,
-                None
+                volume
             ])
 
         return result
@@ -359,7 +367,21 @@ class BacktestingEngine():
         return False
 
     @staticmethod
-    def _get_rate(product: str, rel_epoch: int) -> float:
+    def _get_open_rate(product: str, rel_epoch: int) -> float:
+        """Return the exchange rate at the current timepoint in simulation.
+
+        Arguments:
+            product {str} -- e.g. 'BTC-EUR'
+
+        Returns:
+            float -- exchange rate: price in base currency
+        """
+        return BacktestingEngine.instance.price_data[product][
+            rel_epoch
+        ][4]
+
+    @staticmethod
+    def _get_close_rate(product: str, rel_epoch: int) -> float:
         """Return the exchange rate at the current timepoint in simulation.
 
         Arguments:
