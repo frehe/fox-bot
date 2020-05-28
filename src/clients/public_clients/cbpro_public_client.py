@@ -59,9 +59,13 @@ class CBProPublicClient(MyPublicClient):
                 [time, low, high, open, close, volume] for the
                 duration of granularity
         """
-        return self.public_client.get_product_historic_rates(
-            product_id=product,
-            start=start,
-            end=end,
-            granularity=granularity
-        )
+        rates = []
+        while len(rates) == 0:
+            rates = self.public_client.get_product_historic_rates(
+                product_id=product,
+                start=start,
+                end=end,
+                granularity=granularity
+            )
+
+        return rates

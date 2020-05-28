@@ -29,7 +29,7 @@ class RelativeDropStrategy(Strategy):
 
         buy_signal_generator = \
             RelativeDropSignal(
-                public_client, product, 18*60*60, granularity, p, 0.8)
+                public_client, product, 26*60*60, granularity, p, 0.8)
         sell_signal_generator = \
             RelativeRiseSignal(
                 public_client, product, granularity, 0.05)
