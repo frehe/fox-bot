@@ -6,7 +6,7 @@ from backtesting.backtesting_engine import BacktestingEngine
 
 from utilities.product_infos import ProductInfos
 from utilities.data_handler import DataHandler
-from utilities.utils import getWorkingDirectory, joinPaths
+from utilities.utils import getWorkingDirectory, joinPaths, ISOToUnixTimestamp
 
 
 class Strategy(ABC):
@@ -22,6 +22,7 @@ class Strategy(ABC):
         self.public_client = public_client
         self.auth_client = auth_client
         self.config = config
+        self.episodes = config['strategy_params']['episodes']
 
         self.data_handler = None
 
@@ -33,7 +34,7 @@ class Strategy(ABC):
         # Refresh information on the traded products
         ProductInfos.refresh(self.public_client, self.product)
 
-        for _ in range(self.config['strategy_params']['episodes']):
+        for _ in range(self.episodes):
             # Launch buy signal generator and wait for signal
             buy_signal = self.buy_signal_generator.getSignal()
 
@@ -76,17 +77,25 @@ class Strategy(ABC):
         Returns:
             bool -- Returns True when strategy successfully completes
         """
+        start_time = self.config['backtest']['start']
+        end_time = self.config['backtest']['end']
+        granularity = self.config['backtest']['granularity']
         # Init backtesting engine
         self.Backtest = BacktestingEngine(
-            start_time=self.config['backtest']['start'],
-            end_time=self.config['backtest']['end'],
-            granularity=self.config['backtest']['granularity'],
+            start_time=start_time,
+            end_time=end_time,
+            granularity=granularity,
             balances=self.config['backtest']['start_balances'],
             maker_fee=self.config['backtest']['maker_fee'],
             taker_fee=self.config['backtest']['taker_fee']
         )
 
         self.Backtest.activateProduct(self.product)
+        self.episodes = int(
+            (
+                int(ISOToUnixTimestamp(end_time))
+                - int(ISOToUnixTimestamp(start_time))
+            ) / granularity)
 
         return self.execute()
 

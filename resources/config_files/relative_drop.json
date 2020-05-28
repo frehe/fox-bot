@@ -15,6 +15,9 @@
     "strategy_params": {
         "granularity": 3600,
         "episodes": 100,
-        "p": 0.05
+        "drop_percentage": 0.05,
+        "rise_percentage": 0.05,
+        "timespan": 93600,
+        "max_price_percentage": 0.8
     }
 }

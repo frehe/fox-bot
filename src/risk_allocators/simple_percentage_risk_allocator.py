@@ -22,7 +22,7 @@ class SimplePercentageRiskAllocator(RiskAllocator):
         # self.current_rate = signal.signal['current_rate']
 
         self.available_to_sell = self._getAvailableSell()
-        use_funds = self.available_to_sell
+        use_funds = self.p * self.available_to_sell
 
         if self.activated:
             trade = BuyTrade(

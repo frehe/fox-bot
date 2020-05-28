@@ -24,17 +24,22 @@ class RelativeDropStrategy(Strategy):
             auth_client {MyAuthenticatedClient} -- [description]
             config {dict} -- [description]
         """
-        p = config['strategy_params']['p']
+        drop_percentage = config['strategy_params']['drop_percentage']
+        rise_percentage = config['strategy_params']['rise_percentage']
         granularity = config['strategy_params']['granularity']
+        timespan = config['strategy_params']['timespan']
+        max_price_percentage = \
+            config['strategy_params']['max_price_percentage']
 
         buy_signal_generator = \
             RelativeDropSignal(
-                public_client, product, 26*60*60, granularity, p, 0.8)
+                public_client, product, timespan,
+                granularity, drop_percentage, max_price_percentage)
         sell_signal_generator = \
             RelativeRiseSignal(
-                public_client, product, granularity, 0.05)
+                public_client, product, granularity, rise_percentage)
         risk_allocator = \
-            SimplePercentageRiskAllocator(auth_client, product, 0.1)
+            SimplePercentageRiskAllocator(auth_client, product, 1.0)
 
         super(RelativeDropStrategy, self).__init__(
             buy_signal_generator,
