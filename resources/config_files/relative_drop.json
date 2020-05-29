@@ -2,7 +2,7 @@
     "product": "BTC-EUR",
     "exchange": "Coinbase Pro",
     "strategy": "Relative Drop",
-    "backtest": {
+    "backtest_params": {
         "start": "2019-02-20T14:00:00.000000",
         "end": "2020-05-10T14:00:00.000000",
         "granularity": 3600,
@@ -13,7 +13,7 @@
         "taker_fee": 0.005
     },
     "strategy_params": {
-        "granularity": 3600,
+        "granularity": 60,
         "episodes": 100,
         "drop_percentage": 0.05,
         "rise_percentage": 0.05,
