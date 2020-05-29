@@ -33,6 +33,7 @@ class Strategy(ABC):
 
         # Refresh information on the traded products
         ProductInfos.refresh(self.public_client, self.product)
+        self.data_handler.write_balances(self.auth_client, self.product)
 
         for _ in range(self.episodes):
             # Launch buy signal generator and wait for signal
@@ -77,17 +78,17 @@ class Strategy(ABC):
         Returns:
             bool -- Returns True when strategy successfully completes
         """
-        start_time = self.config['backtest']['start']
-        end_time = self.config['backtest']['end']
-        granularity = self.config['backtest']['granularity']
+        start_time = self.config['backtest_params']['start']
+        end_time = self.config['backtest_params']['end']
+        granularity = self.config['backtest_params']['granularity']
         # Init backtesting engine
         self.Backtest = BacktestingEngine(
             start_time=start_time,
             end_time=end_time,
             granularity=granularity,
-            balances=self.config['backtest']['start_balances'],
-            maker_fee=self.config['backtest']['maker_fee'],
-            taker_fee=self.config['backtest']['taker_fee']
+            balances=self.config['backtest_params']['start_balances'],
+            maker_fee=self.config['backtest_params']['maker_fee'],
+            taker_fee=self.config['backtest_params']['taker_fee']
         )
 
         self.Backtest.activateProduct(self.product)
