@@ -25,6 +25,7 @@ def main(args):
         config = json.load(cf)
 
     product = config['product']
+    config['run_as_backtest'] = str(args.backtest)
 
     if args.backtest:
         auth_client = BacktestingAuthenticatedClient()
@@ -68,6 +69,9 @@ if __name__ == '__main__':
     parser.add_argument(
         '-b', '--backtest', dest='backtest', action='store_true',
         help='if flag is set, backtest the strategy instead of running it')
+    parser.add_argument(
+        '-t', '--test', dest='test', action='store_true',
+        help='if flag is set, run all defined unit and integration tests')
     parser.add_argument(
         '-v', '--verbose', dest='verbose', action='store_true',
         help='enter verbose mode')
